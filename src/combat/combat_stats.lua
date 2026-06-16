@@ -1,0 +1,226 @@
+--[[ combat_stats.lua — reads Dead as Disco's OWN performance signals. No hooks.
+
+  The game grades on Score + Combo + Sync Meter + Multiplier (full API in the
+  dad-combat-stats-api memory). We POLL these on the HUD loop and snapshot them
+  at song end — a handful of safe getter/attribute reads, never intercepting moves.
+  That's the whole point of the pivot: read the values the game already computes
+  (the same tallies it uses for unlocks) instead of intercepting individual moves.
+
+  Everything here is pcall-guarded; any read can fail to nil without breaking a tick. --]]
+local M = {}
+
+local UEHelpers = require("UEHelpers")
+local log = require("utils.log")
+
+local function safe(fn) local ok, r = pcall(fn); if ok then return r end end
+local function valid(o) return o and safe(function() return o:IsValid() end) == true end
+
+-- ---- cached handles (re-fetched whenever they go invalid, e.g. after a map load) ----
+local _sc, _ps
+local _diagged = false   -- one-shot move-key diagnostic (logs once ever, not per read)
+local function scoreComp()
+  if valid(_sc) then return _sc end
+  local pc = safe(function() return UEHelpers.GetPlayerController() end)
+  _sc = (pc and safe(function() return pc:GetScoreComponent() end)) or nil
+  return valid(_sc) and _sc or nil
+end
+local function playerState()
+  if valid(_ps) then return _ps end
+  local pc = safe(function() return UEHelpers.GetPlayerController() end)
+  _ps = (pc and safe(function() return pc.PlayerState end)) or nil
+  return valid(_ps) and _ps or nil
+end
+
+-- Read a GAS attribute's live value: the field is an FGameplayAttributeData, value
+-- lives in .CurrentValue (plain numbers pass straight through).
+local function attr(attrSet, name)
+  local a = safe(function() return attrSet[name] end)
+  if a == nil then return nil end
+  if type(a) == "number" then return a end
+  local cv = safe(function() return a.CurrentValue end)
+  if type(cv) == "number" then return cv end
+  return nil
+end
+
+local function playerOnlyAttrs()
+  local ps = playerState()
+  if not ps then return nil end
+  local poas = safe(function() return ps.PlayerOnlyAttributeSet end)
+  return valid(poas) and poas or nil
+end
+
+--[[ ---- live snapshot (call each HUD tick) ----
+  Returns a flat table of what the player is doing RIGHT NOW. Any field may be nil
+  if that source isn't ready yet (count-in, between songs); callers must tolerate nil. --]]
+function M.Poll()
+  local out = {}
+  local sc = scoreComp()
+  if sc then
+    out.score = safe(function() return sc:GetCombatScore() end)
+  end
+  local poas = playerOnlyAttrs()
+  if poas then
+    -- combo intentionally NOT polled: the game already shows it (it IS the beat counter),
+    -- so a Combo readout duplicates the native HUD and wastes a per-tick attribute read.
+    -- Max combo is read once at song end via GetMaxComboCount instead.
+    out.sync    = attr(poas, "MusicSyncMeter")
+    out.maxSync = attr(poas, "MaxMusicSyncMeter")
+    out.mult    = attr(poas, "CombatScoreGainMult")
+  end
+  return out
+end
+
+-- Sync meter as a 0..1 fraction of its max (the rhythm "how perfect am I" gauge).
+function M.SyncFraction(snap)
+  if not snap or type(snap.sync) ~= "number" then return nil end
+  local mx = (type(snap.maxSync) == "number" and snap.maxSync > 0) and snap.maxSync or 140
+  return math.max(0, math.min(1, snap.sync / mx))
+end
+
+--[[ ---- running accumulation (folds a snapshot into the session state) ----
+  Builds the avg/peak sync + "time at max sync" streak that stand in for
+  "concurrent perfects", plus tracks the live max combo. Pure arithmetic. --]]
+function M.Accumulate(state, snap)
+  if not state or not snap then return end
+  local f = M.SyncFraction(snap)
+  if f then
+    state.SyncSamples = (state.SyncSamples or 0) + 1
+    state.SyncSum     = (state.SyncSum or 0) + f
+    state.SyncPeak    = math.max(state.SyncPeak or 0, f)
+    -- "perfect streak": consecutive ticks at/near full sync (>= 0.95)
+    if f >= 0.95 then
+      state.SyncStreak    = (state.SyncStreak or 0) + 1
+      state.SyncStreakMax = math.max(state.SyncStreakMax or 0, state.SyncStreak)
+    else
+      state.SyncStreak = 0
+    end
+  end
+  if type(snap.score) == "number" then state.TotalScore = snap.score end
+  if type(snap.mult)  == "number" then state.Multiplier = snap.mult end
+
+  -- Capture the per-move breakdown DURING play: the game clears CombatActionScores at song
+  -- end, so a read on the results hook is usually empty. Keep the latest non-empty read
+  -- (throttled to ~every 3rd tick); CaptureFinal prefers it over an empty end-of-song read.
+  state.__moveTick = (state.__moveTick or 0) + 1
+  if state.__moveTick % 3 == 0 then
+    local m = M.ReadMoveScores()
+    if #m > 0 then state.MoveScores = m end
+  end
+end
+
+function M.AvgSync(state)
+  if not state or not state.SyncSamples or state.SyncSamples == 0 then return nil end
+  return state.SyncSum / state.SyncSamples
+end
+
+--[[ ---- per-move score breakdown (read at song end) ----
+  CombatActionScores is a TMap<action, score> on the score component's ScoreBreakdown.
+  Confirmed iterable via :ForEach on this UE4SS build (keys/values arrive wrapped, so
+  :get() each). Returns a list sorted by score desc: { {move=<raw key str>, score=n}, ... }.
+  NOTE: the key's friendly name mapping is refined once we see the raw key format in-game. --]]
+-- The CombatActionScores map is keyed by a UScript Struct (the game IDs combat actions
+-- by a struct — most likely an FGameplayTag). Pull a readable name out of it; return nil
+-- if we can't, so the UI shows a clean fallback label rather than a pointer.
+local function moveKeyName(key)
+  if key == nil then return nil end
+  if type(key) == "string" or type(key) == "number" then return tostring(key) end
+  -- FGameplayTag.TagName is an FName -> "Family.Action"
+  local n = safe(function() local t = key.TagName; return t and t:ToString() end)
+  if type(n) == "string" and n ~= "" and n ~= "None" then return n end
+  -- other common identifier fields (some may wrap their own TagName)
+  for _, f in ipairs({ "ActionTag", "GameplayTag", "Tag", "Name", "ActionName" }) do
+    local v = safe(function()
+      local x = key[f]
+      if type(x) == "string" then return x end
+      if type(x) == "userdata" then
+        return (x.TagName and x.TagName:ToString()) or (x.ToString and x:ToString()) or nil
+      end
+    end)
+    if type(v) == "string" and v ~= "" and v ~= "None" then return v end
+  end
+  return nil
+end
+
+function M.ReadMoveScores()
+  local sc = scoreComp()
+  if not sc then return {} end
+  local sb = safe(function() return sc.ScoreBreakdown end)
+  local map = sb and safe(function() return sb.CombatActionScores end)
+  if not map then return {} end
+
+  local out = {}
+  safe(function()
+    map:ForEach(function(k, v)
+      local key = safe(function() return k.get and k:get() end)
+      local val = safe(function() return v.get and v:get() end)
+      if type(val) ~= "number" then val = safe(function() return tonumber(v) end) end
+      -- one-shot diagnostic on the first key ever seen, so we can finalize the name extraction
+      if not _diagged then
+        _diagged = true
+        log.debug(string.format("[combat] move-key diag: get=%s | k:ToString=%s | TagName=%s",
+          tostring(key),
+          tostring(safe(function() return k:ToString() end)),
+          tostring(safe(function() return key and key.TagName and key.TagName:ToString() end))))
+      end
+      if type(val) == "number" then
+        local name = moveKeyName(key)
+        if not name then
+          local s = safe(function() return k:ToString() end)   -- wrapped-param repr, sometimes the tag
+          if type(s) == "string" and not s:find("Struct") and s ~= "" then name = s end
+        end
+        out[#out + 1] = { move = name, raw = tostring(key), score = val }
+      end
+    end)
+  end)
+  table.sort(out, function(a, b) return a.score > b.score end)
+  return out
+end
+
+-- The game's own level grade (meta-progression Stars). nil if unavailable (e.g. Infinite Disco).
+function M.ReadStars()
+  local ps = playerState()
+  if not ps then return nil end
+  local pd = safe(function() return ps.PlaythroughData end)
+  if not valid(pd) then return nil end
+  return safe(function() return pd:GetStars() end)
+end
+
+-- Snapshot everything into state at song end (for the results screen + XP).
+function M.CaptureFinal(state)
+  if not state then return end
+  local snap = M.Poll()
+  M.Accumulate(state, snap)
+  if type(snap.score) == "number" then state.TotalScore = snap.score end
+  -- max combo straight from the score component (we no longer poll combo each tick)
+  local mc = safe(function() local s = scoreComp(); return s and s:GetMaxComboCount() end)
+  if type(mc) == "number" then state.MaxCombo = mc end
+  local fm = M.ReadMoveScores()
+  if #fm > 0 then state.MoveScores = fm end   -- fresh read if available, else keep the in-play capture
+  state.FinalAvgSync = M.AvgSync(state)
+  state.FinalPeakSync = state.SyncPeak
+  state.StarsAtEnd = M.ReadStars()
+  if type(state.StarsAtEnd) == "number" and type(state.StarsStart) == "number" then
+    state.StarsEarned = math.max(0, state.StarsAtEnd - state.StarsStart)  -- stars earned THIS song
+  end
+  log.debug(string.format("[combat] final: score=%s maxCombo=%s avgSync=%s peakSync=%s moves=%d",
+    tostring(state.TotalScore), tostring(state.MaxCombo),
+    state.FinalAvgSync and string.format("%.2f", state.FinalAvgSync) or "nil",
+    state.FinalPeakSync and string.format("%.2f", state.FinalPeakSync) or "nil",
+    #(state.MoveScores or {})))
+end
+
+-- Reset the per-song accumulators (call at song start).
+function M.Reset(state)
+  if not state then return end
+  state.SyncSamples, state.SyncSum, state.SyncPeak = 0, 0, 0
+  state.SyncStreak, state.SyncStreakMax = 0, 0
+  state.Combo, state.MaxCombo, state.Multiplier = 0, 0, 1
+  state.MoveScores = nil
+  state.__moveTick = 0
+  state.FinalAvgSync, state.FinalPeakSync = nil, nil
+  state.StarsAtEnd, state.StarsEarned = nil, nil
+  _sc, _ps = nil, nil                 -- drop stale handles so the new song re-fetches
+  state.StarsStart = M.ReadStars()    -- baseline for "stars earned this song"
+end
+
+return M

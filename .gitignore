@@ -1,0 +1,72 @@
+# ── Marquee: NEVER publish — copyrighted song lyrics + personal play data ──
+*.lrc
+*.miss
+*.words.json
+*.offset
+_requests.jsonl
+**/data/*.json
+performance_history.json
+profile.json
+
+# ── Marquee: don't bundle UE4SS — install it separately (see README) ──
+assets/
+
+# ── Secrets / credentials (defensive — never commit) ──
+.env
+.env.*
+*.key
+*.pem
+*.p12
+*.pfx
+*.pjson
+secrets.*
+credentials.*
+*.token
+
+# === Logs ===
+*.log
+
+# === IDEs ===
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# === Lua / build artifacts ===
+luac.out
+*.zip
+*.tar.gz
+*.o
+*.os
+*.ko
+*.obj
+*.elf
+*.gch
+*.pch
+*.lib
+*.a
+*.la
+*.lo
+*.def
+*.exp
+
+# === Binaries (DLLs, executables, shared objects) ===
+*.dll
+*.so
+*.so.*
+*.dylib
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# === Crash dumps / backups / temp ===
+*.dmp
+*.bak
+*.tmp
+
+# === OS ===
+.DS_Store
+Thumbs.db

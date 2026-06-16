@@ -1,0 +1,125 @@
+name: Release
+run-name: ${{ format('{0} {1}', inputs.is-dry-run && 'dry-run' || 'release', inputs.tag) }}
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "tag / version number (e.g., v1.0.0)"
+        required: true
+      is-dry-run:
+        description: "dry-run (build only, no publishing)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+env:
+  CHANGELOG_FILE: CHANGELOG.md
+  BUILD_DIR: build
+  STAGING_DIR: build/staging
+  MOD_NAME: Marquee
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: validate version tag
+        run: |
+          if ! echo "${{ inputs.tag }}" | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error title=invalid tag::version must follow semver (e.g., 1.0.0 or v1.0.0)"
+            exit 1
+          fi
+
+      - name: checkout code
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+          fetch-depth: 0
+
+      - name: prepare changelog
+        if: ${{ !inputs.is-dry-run }}
+        uses: thomaseizinger/keep-a-changelog-new-release@v3
+        with:
+          tag: ${{ inputs.tag }}
+
+      - name: assemble release bundle
+        run: |
+          # setup clean staging area
+          rm -rf ${{ env.BUILD_DIR }}
+          mkdir -p "${{ env.STAGING_DIR }}/ue4ss/Mods/${{ env.MOD_NAME }}/Scripts"
+          
+          # copy mod source scripts using dot to ensure correct structure
+          cp -r src/. "${{ env.STAGING_DIR }}/ue4ss/Mods/${{ env.MOD_NAME }}/Scripts/"
+          
+          # dynamically generate enabled file for autoloading
+          touch "${{ env.STAGING_DIR }}/ue4ss/Mods/${{ env.MOD_NAME }}/enabled.txt"
+
+          # inject all assets directly to zip root
+          if [ -d "assets" ]; then
+            cp -r assets/* "${{ env.STAGING_DIR }}/"
+          fi
+
+          # add documentation and meta files
+          [ -d "docs" ] && cp -r docs "${{ env.STAGING_DIR }}/ue4ss/Mods/${{ env.MOD_NAME }}/"
+          cp LICENSE README.md ${{ env.CHANGELOG_FILE }} "${{ env.STAGING_DIR }}/ue4ss/Mods/${{ env.MOD_NAME }}/"
+
+          # generate final archive from staging root
+          ARTIFACT_NAME="${{ env.MOD_NAME }}-${{ inputs.tag }}.zip"
+          cd "${{ env.STAGING_DIR }}"
+          zip -r "../../$ARTIFACT_NAME" .
+          
+          cd ../..
+          mv "$ARTIFACT_NAME" "${{ env.BUILD_DIR }}/$ARTIFACT_NAME"
+
+      - name: generate standalone clean zip
+        run: |
+          # define local temporary paths
+          STANDALONE_STAGING="build/staging_standalone/${{ env.MOD_NAME }}"
+          STANDALONE_NAME="${{ env.MOD_NAME }}-STANDALONE-${{ inputs.tag }}.zip"
+          
+          # create clean directory structure for scripts
+          mkdir -p "$STANDALONE_STAGING/Scripts"
+          
+          # copy only source content inside scripts directory
+          cp -r src/. "$STANDALONE_STAGING/Scripts/"
+          
+          # create enabled file at standalone mod root
+          touch "$STANDALONE_STAGING/enabled.txt"
+          
+          # enter staging folder and zip keeping root mod folder
+          cd build/staging_standalone
+          zip -r "../../${{ env.BUILD_DIR }}/$STANDALONE_NAME" "${{ env.MOD_NAME }}"
+          
+          # clean temporary directory used in this step
+          cd ../..
+          rm -rf build/staging_standalone
+
+      - name: upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.MOD_NAME }}-Artifacts-${{ inputs.tag }}
+          path: ${{ env.BUILD_DIR }}/*.zip
+          retention-days: 7
+
+      - name: git tag and push
+        if: ${{ !inputs.is-dry-run }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@://github.com"
+          git add ${{ env.CHANGELOG_FILE }}
+          git commit -m "chore: release ${{ inputs.tag }}"
+          git tag -a ${{ inputs.tag }} -m "release ${{ inputs.tag }}"
+          git push origin HEAD:${{ github.ref_name }} --tags
+
+      - name: publish release
+        if: ${{ !inputs.is-dry-run }}
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ inputs.tag }}
+          tag_name: ${{ inputs.tag }}
+          files: ${{ env.BUILD_DIR }}/*.zip
+          body_path: ${{ env.CHANGELOG_FILE }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
