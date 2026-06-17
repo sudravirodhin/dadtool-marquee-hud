@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.2] - 2026-06-17
+
+### Fixed
+- Missing Move Data on Results Screen: Restored the move breakdown on the post-song results screen. The previous version's userdata validation check was too strict and marked internal `LocalUnrealParam` wrappers (used to pass move name keys and score values during TMap iteration) as invalid because calling `:IsValid()` on polymorphic base types in Lua throws an error. Upgraded the validation helper to treat any userdata that throws an error when calling `IsValid` as valid/indexable (such as local parameters), only filtering out wrappers that explicitly return `false` (meaning nullptr).
+
 ## [0.4.1] - 2026-06-17
 
 ### Fixed

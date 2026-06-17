@@ -18,7 +18,7 @@ local function is_valid(o)
   if t == "table" then return true end
   if t == "userdata" then
     local ok, res = pcall(function() return o:IsValid() end)
-    return ok and res == true
+    return not ok or res == true
   end
   return false
 end

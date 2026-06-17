@@ -56,7 +56,7 @@ local function is_indexable(obj)
 	if t == "table" then return true end
 	if t == "userdata" then
 		local ok, res = pcall(function() return obj:IsValid() end)
-		return ok and res == true
+		return not ok or res == true
 	end
 	return false
 end
