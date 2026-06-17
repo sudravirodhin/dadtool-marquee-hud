@@ -12,18 +12,23 @@ local M = {}
 local UEHelpers = require("UEHelpers")
 local log = require("utils.log")
 
-local function is_indexable(obj)
-  if not obj then return false end
-  local t = type(obj)
+local function is_valid(o)
+  if not o then return false end
+  local t = type(o)
   if t == "table" then return true end
   if t == "userdata" then
-    return getmetatable(obj) ~= nil
+    local ok, res = pcall(function() return o:IsValid() end)
+    return ok and res == true
   end
   return false
 end
 
+local function is_indexable(obj)
+  return is_valid(obj)
+end
+
 local function safe(fn) local ok, r = pcall(fn); if ok then return r end end
-local function valid(o) return o and is_indexable(o) and safe(function() return o:IsValid() end) == true end
+local function valid(o) return is_valid(o) end
 
 -- ---- cached handles (re-fetched whenever they go invalid, e.g. after a map load) ----
 local _sc, _ps
@@ -39,6 +44,14 @@ local function playerState()
   local pc = safe(function() return is_indexable(UEHelpers) and UEHelpers.GetPlayerController() end)
   _ps = (pc and is_indexable(pc) and safe(function() return pc.PlayerState end)) or nil
   return valid(_ps) and _ps or nil
+end
+
+local _musicSubsys = nil
+local function GetMusicSubsystem()
+  if valid(_musicSubsys) then return _musicSubsys end
+  local insts = FindAllOf("PagodaMusicSubsystem")
+  _musicSubsys = (insts and insts[1]) or nil
+  return valid(_musicSubsys) and _musicSubsys or nil
 end
 
 -- Read a GAS attribute's live value: the field is an FGameplayAttributeData, value
@@ -288,13 +301,6 @@ function M.CaptureFinal(state)
     #(state.MoveScores or {})))
 end
 
-local _musicSubsys = nil
-local function GetMusicSubsystem()
-  if valid(_musicSubsys) then return _musicSubsys end
-  local insts = FindAllOf("PagodaMusicSubsystem")
-  _musicSubsys = (insts and insts[1]) or nil
-  return valid(_musicSubsys) and _musicSubsys or nil
-end
 
 -- Find and cache the star score thresholds for the current song.
 local function discoverStarThresholds(state)

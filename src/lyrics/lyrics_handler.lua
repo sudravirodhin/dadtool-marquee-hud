@@ -46,7 +46,8 @@ local function is_indexable(obj)
   local t = type(obj)
   if t == "table" then return true end
   if t == "userdata" then
-    return getmetatable(obj) ~= nil
+    local ok, res = pcall(function() return obj:IsValid() end)
+    return ok and res == true
   end
   return false
 end
