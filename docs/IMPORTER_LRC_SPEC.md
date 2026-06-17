@@ -27,6 +27,36 @@ That's it. If you get the path, the key, and the timing right, the lyrics appear
 
 ---
 
+## Discovering songs to generate — the catalog manifest
+
+Marquee writes a **full catalog manifest** to the cache dir, once per game load:
+
+```
+ue4ss/Mods/Marquee/Scripts/data/lyrics/_catalog.jsonl
+```
+
+It's the **source of truth for what songs exist** and is the importer's entry point — JSONL, one object
+per line, **every** in-game and imported song, overwritten each load:
+
+```json
+{"key": "<string>", "artist": "<string>", "title": "<string>", "songName": "<string>", "durationSec": <int>, "isImported": <bool>}
+```
+
+| field | meaning |
+|---|---|
+| `key` | the cache key = the `.lrc` filename. **imported** → `ImportedSongUniqueId`; **built-in** → asset short-name (e.g. `PS_MC_Remedy_128`) |
+| `artist` / `title` / `songName` | for the lyric lookup / your reconcile pass |
+| `durationSec` | song length, for duration-matched fetches |
+| `isImported` | `true` = a player import (you produce these at import time, §1–§8); `false` = a packed game song (you fetch online / from the OST) |
+
+**To find what needs lyrics:** read the manifest and generate for each entry where **neither `<key>.lrc`
+nor `<key>.miss` exists** — the manifest is the *whole* catalog, so that check is your gap-finder.
+
+There is **no per-song queue.** Marquee no longer writes `_requests.jsonl`; the manifest replaces it (a
+strict superset). If your importer still reads `_requests.jsonl`, point it at `_catalog.jsonl` instead.
+
+---
+
 ## 1. Where to write
 
 Marquee reads from a fixed cache directory, relative to the game's `Win64` folder:
@@ -153,8 +183,8 @@ mismatch that breaks anything importing `torchaudio`). faster-whisper alone has 
 ## 6. Instrumentals / no vocals
 
 - If a song has no sung vocals, **write no `.lrc`.** Marquee will simply show no lyric bar (clean).
-- Optional nicety: write an **empty `<key>.miss`** file. That tells Marquee "known to have no lyrics,"
-  so it won't log a "queued fetch" line or otherwise nag. Purely optional.
+- Optional nicety: write an **empty `<key>.miss`** file. That marks the song "known to have no lyrics,"
+  so the manifest gap-check (and your own re-runs) skip it. Purely optional.
 - **Do not** write an empty or placeholder `.lrc` — that renders a blank bar.
 
 ---
