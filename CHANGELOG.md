@@ -9,22 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.4.8] - 2026-06-17
 
-### Added
-
-- Gamepad Input Overlay Expansion: Added full support for gamepad face buttons (Y, B), shoulder bumpers (L1, R1), and analog triggers (L2, R2). Sized up the graphical layout to 200x80 and shifted keys down to arrange buttons in a clean, symmetrical format.
-- Joystick & Trigger Polling Fallbacks: Implemented fallback left analog stick polling using `GetInputAnalogStickState` and trigger axis polling (`Gamepad_LeftTriggerAxis` / `Gamepad_RightTriggerAxis` via `GetInputAnalogKeyState`) to ensure analog joystick movement and trigger presses accurately light up the overlay buttons.
-- Input Diagnostic Logging: Added a throttled input diagnostic logger that prints active keys, analog trigger values, and stick coordinates to `UE4SS.log` once per second when input is active.
-
 ### Changed
 
-- Input Overlay F5 Keybind: Pivoted the `F5` keybind to toggle the visual input overlay widget on/off dynamically in real time. The 30ms polling sync loop now runs unconditionally, check-gating the toggle state inside the loop to avoid boot-time load constraints.
+- Mod Stability Optimization: Completely removed the experimental graphical input overlay feature and its high-frequency background loops. Because standard Lua in UE4SS lacks thread safety, high-frequency asynchronous ticks (`LoopAsync`) caused memory races in the Lua virtual machine, leading to `ltable.c` access violations and crashes. Disabling and removing these loops guarantees 100% mod and game stability.
 
 ### Fixed
 
 - HUD Sync Loop Scoping Crash: Fixed a Lua runtime error (`attempt to call a nil value (global 'discoverStarThresholds')` in `combat_stats.lua` at line 157) that completely terminated the HUD sync loop on the first gameplay tick. Relocated `discoverStarThresholds` above `M.Accumulate` so it is in lexical scope, restoring the live projected stars calculation, PB ghost delta, and Hype updates.
-- Input Overlay F5 and Key Query Crash: Fixed native ACCESS_VIOLATION crash (`0xc0000005` in `UE4SS.dll` during `push_nameproperty` Set operation) when executing the temporary `F5` input test keybind or running the input overlay. Passing a raw Lua string (e.g. `"W"`) where the Unreal Engine `FKey` struct parameter expects an `FName` caused a type casting fault inside `LuaUObject.cpp` at line 1645. Solved by wrapping all key strings in the global `FName` constructor (`FName("W")`).
-- Input Overlay Syntax Fix: Restored the missing loop header (`for _, b in ipairs(M.buttons) do`) and local variable scoping inside `input_overlay_hud.lua` that broke the sync loop syntax.
 - Hype Status Emoji Render: Removed the fire emoji (🔥) from `"ON FIRE"` to prevent rendering issues where standard/default game fonts would display it as a white square or a `?` inside a diamond.
+- F5 Boot Loop Reversion: Reverted and removed the virtual C++ `APlayerController:PlayerTick` hook attempt which previously caused mod boot failures.
 
 ## [0.4.7] - 2026-06-17
 
