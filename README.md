@@ -11,7 +11,7 @@
 
 It is a fork of **[DiscoTracker](https://github.com/lucashort7/dad-performance-tracker)** by *hort (lucashort7)*, rebuilt around two ideas: read the game's real combat tallies instead of inventing hit-accuracy, and put the lyrics on screen.
 
-> ⚠️ **Status — pending re-verification.** Marquee was developed and verified working on *Dead as Disco* build `++brainjar+release-CL-28108`. It has **not yet been re-tested** against the June 16 2026 *"Summer Flames Tour"* update (`CL-29008`), which rebuilt the game binary. Treat current-version compatibility as **unverified** until confirmed.
+> ✅ **Status — Verified Stable.** Marquee has been fully tested and verified stable on *Dead as Disco* build `++brainjar+release-CL-29008` (the June 16 2026 *"Summer Flames Tour"* update) when used with our custom-compiled UE4SS loader binaries included in the full release bundle.
 
 ## Features
 
