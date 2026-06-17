@@ -20,7 +20,7 @@ It is a fork of **[DiscoTracker](https://github.com/lucashort7/dad-performance-t
 - **Post-song report** — a score-share breakdown (which moves earned what, as a % of the run plus compact totals), Stars earned, sync avg/peak, and a level-up hero panel.
 - **Leveling** — sync-weighted XP, levels, and titles that persist across sessions.
 - **Career Stats (F6)** — most-played tracks, top scores, and your level, aggregated from local history.
-- **Live glance** — a small bottom-left panel with your PB and live Sync %.
+- **Live glance** — a small bottom-left panel showing your PB, live Sync %, live Star rating projection (e.g. 3★/4★/5★), PB Delta trajectory comparison, and dynamic "ON FIRE" Hype indicator.
 - **Hub badge** — a quiet "Marquee ON" indicator, shown only in The Encore.
 
 ## Why the rewrite?
