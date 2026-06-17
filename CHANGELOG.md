@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-06-17
+
+### Added
+- Projected Star Rating: Live star projection calculation (3★, 4★, or 5★) based on current score trajectory and level thresholds.
+- PB Ghost Tracker: Live score delta (+/-) showing comparison to the personal best linear score trajectory at the current timeline playhead position.
+- "On Fire" Status: Dynamic Hype status indicating if average sync accuracy over the last 10 seconds is 90%+. Flared border overlay turns glowing gold/orange when "On Fire".
+- Automatic Star Score Threshold Discovery: Runtime reflection lookup of star score milestones from song asset metadata and playthrough records.
+
 ## [0.3.0] - 2026-06-17
 
 ### Added

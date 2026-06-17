@@ -118,6 +118,64 @@ function M.Accumulate(state, snap)
     local m = M.ReadMoveScores()
     if #m > 0 then state.MoveScores = m end
   end
+
+  -- 1. Star Rating Projection
+  state.ProjectedStars = 0
+  local subsys = GetMusicSubsystem()
+  if subsys then
+    local pos = safe(function() return subsys:GetTimelinePosition() end)
+    local len = state.SongLengthSec or safe(function() return subsys:GetSongLengthSeconds() end)
+    if type(pos) == "number" and type(len) == "number" and pos > 5 and len > 0 then
+      local current_score = state.TotalScore or 0
+      local projected = current_score * (len / pos)
+      state.ProjectedScore = projected
+
+      -- Compare to thresholds (fall back to standard guesses if not discovered)
+      local thresh = state.StarThresholds or { [3] = 120000, [4] = 240000, [5] = 480000 }
+      if projected >= (thresh[5] or 480000) then
+        state.ProjectedStars = 5
+      elseif projected >= (thresh[4] or 240000) then
+        state.ProjectedStars = 4
+      elseif projected >= (thresh[3] or 120000) then
+        state.ProjectedStars = 3
+      else
+        state.ProjectedStars = 0
+      end
+    end
+  end
+
+  -- 2. PB Ghost Tracker (delta display)
+  state.PbDelta = nil
+  if state.CachedPB and type(state.CachedPB.highScore) == "number" and state.CachedPB.highScore > 0 then
+    if subsys then
+      local pos = safe(function() return subsys:GetTimelinePosition() end)
+      local len = state.SongLengthSec or safe(function() return subsys:GetSongLengthSeconds() end)
+      if type(pos) == "number" and type(len) == "number" and len > 0 then
+        local expected = state.CachedPB.highScore * (pos / len)
+        state.PbDelta = (state.TotalScore or 0) - expected
+      end
+    end
+  end
+
+  -- 3. Hype status (rolling average of sync accuracy over the last 10s -> 25 samples)
+  state.RecentSync = state.RecentSync or {}
+  if f then
+    table.insert(state.RecentSync, f)
+    if #state.RecentSync > 25 then
+      table.remove(state.RecentSync, 1)
+    end
+    local sum = 0
+    for _, v in ipairs(state.RecentSync) do sum = sum + v end
+    state.RecentSyncAvg = sum / #state.RecentSync
+
+    if #state.RecentSync >= 5 and state.RecentSyncAvg >= 0.90 then
+      state.HypeStatus = "ON FIRE 🔥"
+    else
+      state.HypeStatus = "—"
+    end
+  else
+    state.HypeStatus = "—"
+  end
 end
 
 function M.AvgSync(state)
@@ -230,6 +288,71 @@ function M.CaptureFinal(state)
     #(state.MoveScores or {})))
 end
 
+local _musicSubsys = nil
+local function GetMusicSubsystem()
+  if valid(_musicSubsys) then return _musicSubsys end
+  local insts = FindAllOf("PagodaMusicSubsystem")
+  _musicSubsys = (insts and insts[1]) or nil
+  return valid(_musicSubsys) and _musicSubsys or nil
+end
+
+-- Find and cache the star score thresholds for the current song.
+local function discoverStarThresholds(state)
+  state.StarThresholds = nil
+  local ps = playerState()
+  if not ps then return end
+  local pd = safe(function() return ps.PlaythroughData end)
+  local subsys = GetMusicSubsystem()
+  local song = subsys and safe(function() return subsys:GetCurrentSong() end)
+
+  if not pd or not is_indexable(pd) then return end
+
+  -- 1. Try to read array-like properties
+  for _, name in ipairs({"StarThresholds", "ScoreThresholds", "StarsThresholds"}) do
+    local arr = safe(function() return pd[name] end) or (song and is_indexable(song) and safe(function() return song[name] end))
+    if arr and is_indexable(arr) then
+      local t = {}
+      pcall(function()
+        arr:ForEach(function(_, e)
+          local val = safe(function() return e:get() end) or e
+          if type(val) == "number" then table.insert(t, val) end
+        end)
+      end)
+      if #t > 0 then
+        state.StarThresholds = t
+        log.info(string.format("[combat] Found star thresholds in array %s: %s", name, table.concat(t, ", ")))
+        return
+      end
+    end
+  end
+
+  -- 2. Try to read individual properties for stars 3, 4, 5
+  local t = {}
+  local foundAny = false
+  for i = 3, 5 do
+    local field_names = {
+      string.format("ScoreThreshold%d", i),
+      string.format("StarThreshold%d", i),
+      string.format("ScoreFor%dStars", i),
+      string.format("%dStarScore", i),
+      string.format("%dStarThreshold", i),
+    }
+    for _, name in ipairs(field_names) do
+      local val = safe(function() return pd[name] end) or (song and is_indexable(song) and safe(function() return song[name] end))
+      if type(val) == "number" then
+        t[i] = val
+        foundAny = true
+        break
+      end
+    end
+  end
+  if foundAny then
+    state.StarThresholds = t
+    log.info(string.format("[combat] Found star thresholds in individual fields: 3*=%s, 4*=%s, 5*=%s", tostring(t[3]), tostring(t[4]), tostring(t[5])))
+    return
+  end
+end
+
 -- Reset the per-song accumulators (call at song start).
 function M.Reset(state)
   if not state then return end
@@ -242,6 +365,17 @@ function M.Reset(state)
   state.StarsAtEnd, state.StarsEarned = nil, nil
   _sc, _ps = nil, nil                 -- drop stale handles so the new song re-fetches
   state.StarsStart = M.ReadStars()    -- baseline for "stars earned this song"
+
+  -- Clear and initialize our new features' state
+  state.StarThresholds = nil
+  state.ProjectedStars = 0
+  state.ProjectedScore = 0
+  state.PbDelta = nil
+  state.RecentSync = {}
+  state.RecentSyncAvg = 0
+  state.HypeStatus = "—"
+
+  discoverStarThresholds(state)
 end
 
 return M

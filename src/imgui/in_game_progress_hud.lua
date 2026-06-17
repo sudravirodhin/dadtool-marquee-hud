@@ -8,9 +8,8 @@ local umg_factory = require("utils.umg_factory")
 local combat_stats = require("combat.combat_stats")
 
 M.progressWidget = nil
+M.borderWidget = nil
 M.controls = {}
-
-
 
 function M.Create()
 	local hud = umg_factory.CreateHUD("InGameProgressHUD")
@@ -18,6 +17,7 @@ function M.Create()
 
 	local canvas = umg_factory.CreateCanvas(hud.WidgetTree, "InGameProgressCanvas")
 	local border = umg_factory.CreateBorder(canvas, "InGameProgressBorder")
+	M.borderWidget = border
 	local vBox = umg_factory.CreateVerticalBox(border, "StatsVerticalBox")
 
 	local function row(label, key, valColor)
@@ -31,9 +31,13 @@ function M.Create()
 		})
 	end
 
-	-- Only the two things the native HUD does NOT show: your PB to beat + a live sync %.
+	-- Setup HUD elements aligned to 6-character labels for perfect spacing
 	row("PB    ", "pb")
+	row("Delta ", "pb_delta")
 	row("Sync  ", "sync", hud_utils.SyncColor(1))
+	row("Proj  ", "proj")
+	row("Hype  ", "hype")
+
 	umg_factory.ApplyAlignment(canvas, border, cfg.HUD_MAIN_ALLIGNMENT or "topright",
 		{ X = cfg.HUD_POS_X or -25, Y = cfg.HUD_POS_Y or 95 })
 
@@ -59,17 +63,58 @@ function M.Update(state, snap)
 
 	local frac = combat_stats.SyncFraction(snap)
 
-	-- PB to beat (the native HUD never shows your personal best for a song)
+	-- 1. PB to beat
 	if state and state.CachedPB and state.CachedPB.highScore and state.CachedPB.highScore > 0 then
 		set("pb", hud_utils.Abbrev(state.CachedPB.highScore))
 	else
 		set("pb", "—")
 	end
-	-- live sync % (the one rhythm number the game doesn't put on screen)
+
+	-- 2. Live PB Delta (ghost tracker)
+	if state and type(state.PbDelta) == "number" then
+		local d = state.PbDelta
+		local prefix = d >= 0 and "+" or ""
+		local color = d >= 0 and hud_utils.FSlateColor(0.1, 1, 0.1, 0.9) or hud_utils.FSlateColor(1, 0.2, 0.2, 0.9)
+		set("pb_delta", string.format("%s%s", prefix, hud_utils.Commafy(math.floor(d + 0.5))), color)
+	else
+		set("pb_delta", "—", hud_utils.FSlateColor(1, 1, 1, 0.5))
+	end
+
+	-- 3. Live sync %
 	if frac then
 		set("sync", string.format("%d%%", math.floor(frac * 100 + 0.5)), hud_utils.SyncColor(frac))
 	else
 		set("sync", "—")
+	end
+
+	-- 4. Projected Star Rating
+	if state and type(state.ProjectedStars) == "number" and state.ProjectedStars > 0 then
+		local stars_str = string.rep("★", state.ProjectedStars) .. string.rep("☆", 5 - state.ProjectedStars)
+		set("proj", stars_str, hud_utils.FSlateColor(1, 0.85, 0.2, 1))
+	else
+		set("proj", "—", hud_utils.FSlateColor(1, 1, 1, 0.5))
+	end
+
+	-- 5. Hype status and flare-up indicator
+	if state and state.HypeStatus then
+		local is_on_fire = (state.HypeStatus == "ON FIRE 🔥")
+		local color = is_on_fire and hud_utils.FSlateColor(1, 0.5, 0, 1) or hud_utils.FSlateColor(1, 1, 1, 0.5)
+		set("hype", state.HypeStatus, color)
+
+		-- Flare up the border brush color
+		if M.borderWidget and M.borderWidget:IsValid() then
+			pcall(function()
+				if is_on_fire then
+					-- Glowing orange/gold background
+					M.borderWidget:SetBrushColor(hud_utils.FLinearColor(1, 0.5, 0, 0.6))
+				else
+					-- Standard semi-transparent black background
+					M.borderWidget:SetBrushColor(hud_utils.FLinearColor(0, 0, 0, 0.2))
+				end
+			end)
+		end
+	else
+		set("hype", "—", hud_utils.FSlateColor(1, 1, 1, 0.5))
 	end
 end
 
@@ -81,6 +126,7 @@ function M.Destroy()
 		end)
 	end
 	M.progressWidget = nil
+	M.borderWidget = nil
 	M.controls = {}
 end
 
