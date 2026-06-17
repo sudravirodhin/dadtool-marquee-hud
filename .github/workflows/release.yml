@@ -39,6 +39,7 @@ jobs:
           fetch-depth: 0
 
       - name: prepare changelog
+        id: changelog
         if: ${{ !inputs.is-dry-run }}
         uses: thomaseizinger/keep-a-changelog-new-release@v3
         with:
@@ -96,6 +97,46 @@ jobs:
           cd ../..
           rm -rf build/staging_standalone
 
+      - name: generate custom loader zip
+        run: |
+          if [ -d "assets" ]; then
+            UE4SS_STAGING="build/staging_ue4ss"
+            UE4SS_NAME="UE4SS-custom-${{ inputs.tag }}.zip"
+            mkdir -p "$UE4SS_STAGING"
+            cp -r assets/* "$UE4SS_STAGING/"
+            cd build/staging_ue4ss
+            zip -r "../../${{ env.BUILD_DIR }}/$UE4SS_NAME" .
+            cd ../..
+            rm -rf build/staging_ue4ss
+          fi
+
+      - name: generate release body
+        if: ${{ !inputs.is-dry-run }}
+        run: |
+          mkdir -p build
+          cat << 'EOF' > build/release_body.md
+          > [!IMPORTANT]
+          > **AI Assistance Disclosure & Disclaimer**
+          > This project was developed with the assistance of an AI Large Language Model (LLM). It is a purely personal, non-profit project built for fun to speed up development and make it easier to enjoy the game. If you are not comfortable using software that has been touched or written with the help of AI, please do not proceed.
+
+          EOF
+          
+          echo "${{ steps.changelog.outputs.release-notes }}" >> build/release_body.md
+          
+          cat << 'EOF' >> build/release_body.md
+
+          ---
+
+          ### Distribution Packages
+
+          * **`Marquee-${{ inputs.tag }}.zip` (Full Bundle - Recommended)**: Contains both the Marquee mod and our custom-compiled, stable UE4SS loader binaries. Recommended for most users to ensure game stability.
+          * **`Marquee-STANDALONE-${{ inputs.tag }}.zip` (Mod-Only Standalone)**: Contains only the `Marquee` mod folder. Choose this if you already have a working UE4SS setup and want to manage the loader yourself.
+          * **`UE4SS-custom-${{ inputs.tag }}.zip` (UE4SS Binaries Only)**: Contains only our custom-compiled, stable UE4SS loader binaries configured for *Dead as Disco*. Choose this if you want our crash-free UE4SS setup to run other mods without installing the Marquee HUD.
+
+          > [!WARNING]
+          > Upstream/standard UE4SS versions are currently prone to native loader bugs (e.g. use-after-free hook crashes on game build `CL-29008`). Our custom-built loader is optimized to bypass these crashes.
+          EOF
+
       - name: upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -120,6 +161,6 @@ jobs:
           name: ${{ inputs.tag }}
           tag_name: ${{ inputs.tag }}
           files: ${{ env.BUILD_DIR }}/*.zip
-          body_path: ${{ env.CHANGELOG_FILE }}
+          body_path: build/release_body.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
