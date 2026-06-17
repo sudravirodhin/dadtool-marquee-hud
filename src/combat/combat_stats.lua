@@ -12,31 +12,43 @@ local M = {}
 local UEHelpers = require("UEHelpers")
 local log = require("utils.log")
 
+local function is_indexable(obj)
+  if not obj then return false end
+  local t = type(obj)
+  if t == "table" then return true end
+  if t == "userdata" then
+    return getmetatable(obj) ~= nil
+  end
+  return false
+end
+
 local function safe(fn) local ok, r = pcall(fn); if ok then return r end end
-local function valid(o) return o and safe(function() return o:IsValid() end) == true end
+local function valid(o) return o and is_indexable(o) and safe(function() return o:IsValid() end) == true end
 
 -- ---- cached handles (re-fetched whenever they go invalid, e.g. after a map load) ----
 local _sc, _ps
 local _diagged = false   -- one-shot move-key diagnostic (logs once ever, not per read)
 local function scoreComp()
   if valid(_sc) then return _sc end
-  local pc = safe(function() return UEHelpers.GetPlayerController() end)
-  _sc = (pc and safe(function() return pc:GetScoreComponent() end)) or nil
+  local pc = safe(function() return is_indexable(UEHelpers) and UEHelpers.GetPlayerController() end)
+  _sc = (pc and is_indexable(pc) and safe(function() return pc:GetScoreComponent() end)) or nil
   return valid(_sc) and _sc or nil
 end
 local function playerState()
   if valid(_ps) then return _ps end
-  local pc = safe(function() return UEHelpers.GetPlayerController() end)
-  _ps = (pc and safe(function() return pc.PlayerState end)) or nil
+  local pc = safe(function() return is_indexable(UEHelpers) and UEHelpers.GetPlayerController() end)
+  _ps = (pc and is_indexable(pc) and safe(function() return pc.PlayerState end)) or nil
   return valid(_ps) and _ps or nil
 end
 
 -- Read a GAS attribute's live value: the field is an FGameplayAttributeData, value
 -- lives in .CurrentValue (plain numbers pass straight through).
 local function attr(attrSet, name)
+  if not is_indexable(attrSet) then return nil end
   local a = safe(function() return attrSet[name] end)
   if a == nil then return nil end
   if type(a) == "number" then return a end
+  if not is_indexable(a) then return nil end
   local cv = safe(function() return a.CurrentValue end)
   if type(cv) == "number" then return cv end
   return nil
@@ -124,16 +136,26 @@ end
 local function moveKeyName(key)
   if key == nil then return nil end
   if type(key) == "string" or type(key) == "number" then return tostring(key) end
+  if not is_indexable(key) then return nil end
   -- FGameplayTag.TagName is an FName -> "Family.Action"
-  local n = safe(function() local t = key.TagName; return t and t:ToString() end)
+  local n = safe(function()
+    local t = key.TagName
+    return t and is_indexable(t) and t.ToString and t:ToString()
+  end)
   if type(n) == "string" and n ~= "" and n ~= "None" then return n end
   -- other common identifier fields (some may wrap their own TagName)
   for _, f in ipairs({ "ActionTag", "GameplayTag", "Tag", "Name", "ActionName" }) do
     local v = safe(function()
       local x = key[f]
       if type(x) == "string" then return x end
-      if type(x) == "userdata" then
-        return (x.TagName and x.TagName:ToString()) or (x.ToString and x:ToString()) or nil
+      if type(x) == "userdata" and is_indexable(x) then
+        local tag = x.TagName
+        if is_indexable(tag) and tag.ToString then
+          return tag:ToString()
+        end
+        if x.ToString then
+          return x:ToString()
+        end
       end
     end)
     if type(v) == "string" and v ~= "" and v ~= "None" then return v end
@@ -151,21 +173,21 @@ function M.ReadMoveScores()
   local out = {}
   safe(function()
     map:ForEach(function(k, v)
-      local key = safe(function() return k.get and k:get() end)
-      local val = safe(function() return v.get and v:get() end)
-      if type(val) ~= "number" then val = safe(function() return tonumber(v) end) end
+      local key = safe(function() return is_indexable(k) and k.get and k:get() end)
+      local val = safe(function() return is_indexable(v) and v.get and v:get() end)
+      if type(val) ~= "number" then val = safe(function() return is_indexable(v) and tonumber(v) end) end
       -- one-shot diagnostic on the first key ever seen, so we can finalize the name extraction
       if not _diagged then
         _diagged = true
         log.debug(string.format("[combat] move-key diag: get=%s | k:ToString=%s | TagName=%s",
           tostring(key),
-          tostring(safe(function() return k:ToString() end)),
-          tostring(safe(function() return key and key.TagName and key.TagName:ToString() end))))
+          tostring(safe(function() return is_indexable(k) and k:ToString() end)),
+          tostring(safe(function() return is_indexable(key) and key.TagName and key.TagName:ToString() end))))
       end
       if type(val) == "number" then
         local name = moveKeyName(key)
         if not name then
-          local s = safe(function() return k:ToString() end)   -- wrapped-param repr, sometimes the tag
+          local s = safe(function() return is_indexable(k) and k:ToString() end)   -- wrapped-param repr, sometimes the tag
           if type(s) == "string" and not s:find("Struct") and s ~= "" then name = s end
         end
         out[#out + 1] = { move = name, raw = tostring(key), score = val }
