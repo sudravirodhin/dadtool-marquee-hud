@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.3] - 2026-06-17
+
+### Added
+- Default Layout Adjustments: Moved the in-game progress HUD to the bottom-left corner by default (`cfg.HUD_MAIN_ALLIGNMENT = "bottomleft"`) to prevent it from overlapping or bleeding over the game's native top-right score interface.
+
+### Fixed
+- HUD Pause State Visibility: Fixed the issue where the live stats panel would not hide when pausing the game. The script was calling the native `widget:GetVisibility()` method, which is known to throw a native exception on UE4SS v4.0.0 and abort the visibility update logic. Replaced it with a robust local Lua visibility state cache, identical to the pattern used in the lyrics HUD.
+
 ## [0.4.2] - 2026-06-17
 
 ### Fixed

@@ -1,7 +1,7 @@
 local cfg = {}
 
 -- ~version (bump MARQUEE_VERSION on releases; UE4SS_VERSION updated when the loader is swapped)
-cfg.MARQUEE_VERSION = "0.4.2"
+cfg.MARQUEE_VERSION = "0.4.3"
 cfg.UE4SS_VERSION = "4.0.0-rc1"
 
 -- ~log
@@ -13,9 +13,9 @@ cfg.HUD_UPDATE_INTERVAL_MS = 400
 --[[
     ============ ~hud cfg ============
 --]]
-cfg.HUD_MAIN_ALLIGNMENT = "topright"   -- live PB + Sync panel: top-right, near the game's score
-cfg.HUD_POS_X = -10                   -- live panel offset px: - = in from the right edge
-cfg.HUD_POS_Y = 290                    -- + = down from top; sits BELOW the native score block (457 / Score / xMult)
+cfg.HUD_MAIN_ALLIGNMENT = "bottomleft"   -- live PB + Sync panel: bottom-left
+cfg.HUD_POS_X = 15                      -- live panel offset px: + = in from the left edge
+cfg.HUD_POS_Y = -15                     -- - = up from the bottom edge
 cfg.HUD_LABEL_LAYOUT = "friendly"
 -- The "♪ Marquee" status badge is only drawn in the hub world. "The Encore" hub logs
 -- as L_DiveBar_V2 (path .../Pagoda/Levels/DiveBar/). The live map's full path is matched

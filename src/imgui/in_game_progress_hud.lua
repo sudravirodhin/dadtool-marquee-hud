@@ -42,6 +42,7 @@ function M.Create()
 		{ X = cfg.HUD_POS_X or -25, Y = cfg.HUD_POS_Y or 95 })
 
 	hud.Visibility = hud_utils.Visibility.HIDDEN
+	M._cachedVisibility = hud_utils.Visibility.HIDDEN
 	hud:AddToViewport(999)
 	M.progressWidget = hud
 end
@@ -128,17 +129,19 @@ function M.Destroy()
 	M.progressWidget = nil
 	M.borderWidget = nil
 	M.controls = {}
+	M._cachedVisibility = nil
 end
 
 function M.SetVisibility(visibility)
 	if not M.progressWidget or not M.progressWidget:IsValid() then return end
-	if M.progressWidget:GetVisibility() == visibility then return end
+	if M._cachedVisibility == visibility then return end
 	pcall(function() M.progressWidget:SetVisibility(visibility) end)
+	M._cachedVisibility = visibility
 end
 
 function M.Toggle()
 	if not M.progressWidget or not M.progressWidget:IsValid() then return false end
-	local current = M.progressWidget:GetVisibility()
+	local current = M._cachedVisibility or hud_utils.Visibility.HIDDEN
 	local nextVisibility = (
 		current == hud_utils.Visibility.HITTESTINVISIBLE and hud_utils.Visibility.HIDDEN
 		or hud_utils.Visibility.HITTESTINVISIBLE
