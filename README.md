@@ -29,7 +29,7 @@ DiscoTracker tracked invented hit-accuracy ("Perfect" rates, letter ranks) by ho
 
 ## Install
 
-Marquee requires **UE4SS** (the Unreal Engine scripting system). We provide two release options on our **[GitHub Releases page](https://github.com/sudravirodhin/dadtool-marquee-hud/releases)**:
+Marquee requires **UE4SS** (the Unreal Engine scripting system). We provide three release options on our **[GitHub Releases page](https://github.com/sudravirodhin/dadtool-marquee-hud/releases)**:
 
 ### Option A: Full Bundle (Recommended)
 This includes the Marquee mod and our custom-compiled, stable UE4SS loader binaries configured for *Dead as Disco* build `CL-29008`.
@@ -45,7 +45,13 @@ This contains only the `Marquee` mod folder itself, meant to be swapped into an 
 4. Launch the game.
 
 > [!WARNING]
-> **No guarantee on stability is provided for the mod-only package** if used with standard or upstream UE4SS versions. Upstream loader versions are prone to native crashes (e.g. use-after-free hook faults on game build `CL-29008`). Our full bundle is custom-built and optimized to bypass these crashes.
+> **No guarantee on stability is provided for the mod-only package** if used with standard or upstream UE4SS releases. Upstream loader versions are prone to native crashes (e.g. use-after-free hook faults on game build `CL-29008`). Our full bundle is custom-built and optimized to bypass these crashes.
+
+### Option C: Custom UE4SS Binaries Only (Standalone)
+Looking just for our custom UE4SS? Here it is!
+1. Download the standalone custom UE4SS package (`UE4SS-vX.Y.Z-custom.zip`) from the releases page.
+2. Unzip its contents directly into `Dead as Disco/Pagoda/Binaries/Win64/` (so that `dwmapi.dll` and the `ue4ss/` folder structure sit next to `Pagoda-Win64-Shipping.exe`).
+3. Proceed with running any other UE4SS Lua mods without the Marquee mod.
 
 ### Lyrics (optional, and BYO)
 
