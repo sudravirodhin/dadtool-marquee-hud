@@ -222,19 +222,6 @@ LoopAsync(cfg.LYRICS_TICK_MS or 60, function()
 	return false
 end)
 
--- input overlay sync loop (high-frequency 30ms polling, runs strictly on the game thread to avoid multithreading race conditions)
-local input_overlay_hud = require("imgui.input_overlay_hud")
-LoopAsync(30, function()
-	if cfg.INPUT_OVERLAY_ENABLED then
-		ExecuteInGameThread(function()
-			local pc = UEHelpers.GetPlayerController()
-			if pc and pc:IsValid() then
-				pcall(input_overlay_hud.Update, pc)
-			end
-		end)
-	end
-	return false
-end)
 
 -- Once the song catalog is loaded, dump the FULL manifest (_catalog.jsonl: every in-game +
 -- imported song's current key + meta) so dadtool always has the complete song list to generate
@@ -269,23 +256,7 @@ RegisterKeyBind(Key.F3, function()
 	hud_handler.UpdateModStatus(s)
 end)
 
--- F5: Toggle Input Overlay
-RegisterKeyBind(Key.F5, function()
-	cfg.INPUT_OVERLAY_ENABLED = not cfg.INPUT_OVERLAY_ENABLED
-	ExecuteInGameThread(function()
-		local overlay = require("imgui.input_overlay_hud")
-		if cfg.INPUT_OVERLAY_ENABLED then
-			print("[Marquee] Input Overlay enabled via F5")
-			if not overlay.IsValid() then
-				overlay.Create()
-			end
-			overlay.SetVisibility(hud_utils.Visibility.HITTESTINVISIBLE)
-		else
-			print("[Marquee] Input Overlay disabled via F5")
-			overlay.Destroy()
-		end
-	end)
-end)
+
 
 -- ============ F6: Career Stats panel (toggle) ============
 RegisterKeyBind(Key.F6, function()

@@ -5,7 +5,7 @@ local cfg = require("config")
 local combat_stats = require("combat.combat_stats")
 local in_game_progress_hud = require("imgui.in_game_progress_hud")
 local results_hud = require("imgui.results_hud")
-local input_overlay_hud = require("imgui.input_overlay_hud")
+-- (input_overlay_hud removed to restore stability)
 local status_indicator_hud = require("imgui.status_indicator_hud")
 local hud_utils = require("utils.hud_utils")
 local log = require("utils.log")
@@ -67,7 +67,6 @@ end
 -- Create-if-missing helpers: each widget exists ONLY while its state needs it.
 local function ensureStats()
 	if not in_game_progress_hud.IsValid() then in_game_progress_hud.Create() end
-	if cfg.INPUT_OVERLAY_ENABLED and not input_overlay_hud.IsValid() then input_overlay_hud.Create() end
 end
 
 local function ensureBadge()
@@ -115,14 +114,6 @@ function M.SetState(newState, sessionState)
 	if newState == M.States.PRE_GAME then
 		-- hub: stats panel + report gone; badge only in The Encore
 		in_game_progress_hud.Destroy()
-		if not cfg.INPUT_OVERLAY_ENABLED then
-			input_overlay_hud.Destroy()
-		else
-			if not input_overlay_hud.IsValid() then
-				input_overlay_hud.Create()
-			end
-			input_overlay_hud.SetVisibility(hud_utils.Visibility.HITTESTINVISIBLE)
-		end
 		results_hud.Hide()
 		if M.IsHubWorld() then ensureBadge() else status_indicator_hud.Destroy() end
 		M.RefreshLevel()
@@ -138,21 +129,10 @@ function M.SetState(newState, sessionState)
 			in_game_progress_hud.SetVisibility(hud_utils.Visibility.HIDDEN)
 		end
 
-		if cfg.INPUT_OVERLAY_ENABLED then
-			input_overlay_hud.SetVisibility(hud_utils.Visibility.HITTESTINVISIBLE)
-		else
-			input_overlay_hud.SetVisibility(hud_utils.Visibility.HIDDEN)
-		end
-
 	elseif newState == M.States.RESULTS then
 		-- results: only the report is drawn; hub badge + stats panel stay gone
 		status_indicator_hud.Destroy()
 		in_game_progress_hud.Destroy()
-		if not cfg.INPUT_OVERLAY_ENABLED then
-			input_overlay_hud.Destroy()
-		else
-			input_overlay_hud.SetVisibility(hud_utils.Visibility.HIDDEN)
-		end
 		if sessionState then
 			results_hud.Show(sessionState)
 		end
@@ -187,16 +167,6 @@ function M.Sync(sessionState)
 		in_game_progress_hud.SetVisibility(hud_utils.Visibility.HIDDEN)
 	end
 
-	-- input overlay visibility is independent of tracker visibility
-	if cfg.INPUT_OVERLAY_ENABLED then
-		if not isSongPaused() then
-			input_overlay_hud.SetVisibility(hud_utils.Visibility.HITTESTINVISIBLE)
-		else
-			input_overlay_hud.SetVisibility(hud_utils.Visibility.HIDDEN)
-		end
-	else
-		input_overlay_hud.SetVisibility(hud_utils.Visibility.HIDDEN)
-	end
 end
 
 function M.UpdateModStatus(sessionState)
