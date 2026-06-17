@@ -225,7 +225,7 @@ end)
 -- input overlay sync loop (high-frequency 30ms polling, runs only if enabled and playing)
 local input_overlay_hud = require("imgui.input_overlay_hud")
 LoopAsync(30, function()
-	if cfg.INPUT_OVERLAY_ENABLED and hud_handler.CurrentState == hud_handler.States.IN_GAME then
+	if cfg.INPUT_OVERLAY_ENABLED then
 		ExecuteInGameThread(function()
 			local pc = UEHelpers.GetPlayerController()
 			if pc and pc:IsValid() then
@@ -279,9 +279,7 @@ RegisterKeyBind(Key.F5, function()
 			if not overlay.IsValid() then
 				overlay.Create()
 			end
-			if hud_handler.CurrentState == hud_handler.States.IN_GAME and _G.__SessionAggAccuracy.IsTrackerVisible then
-				overlay.SetVisibility(hud_utils.Visibility.HITTESTINVISIBLE)
-			end
+			overlay.SetVisibility(hud_utils.Visibility.HITTESTINVISIBLE)
 		else
 			print("[Marquee] Input Overlay disabled via F5")
 			overlay.Destroy()

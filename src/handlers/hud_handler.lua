@@ -115,7 +115,14 @@ function M.SetState(newState, sessionState)
 	if newState == M.States.PRE_GAME then
 		-- hub: stats panel + report gone; badge only in The Encore
 		in_game_progress_hud.Destroy()
-		input_overlay_hud.Destroy()
+		if not cfg.INPUT_OVERLAY_ENABLED then
+			input_overlay_hud.Destroy()
+		else
+			if not input_overlay_hud.IsValid() then
+				input_overlay_hud.Create()
+			end
+			input_overlay_hud.SetVisibility(hud_utils.Visibility.HITTESTINVISIBLE)
+		end
 		results_hud.Hide()
 		if M.IsHubWorld() then ensureBadge() else status_indicator_hud.Destroy() end
 		M.RefreshLevel()
@@ -139,7 +146,11 @@ function M.SetState(newState, sessionState)
 		-- results: only the report is drawn; hub badge + stats panel stay gone
 		status_indicator_hud.Destroy()
 		in_game_progress_hud.Destroy()
-		input_overlay_hud.Destroy()
+		if not cfg.INPUT_OVERLAY_ENABLED then
+			input_overlay_hud.Destroy()
+		else
+			input_overlay_hud.SetVisibility(hud_utils.Visibility.HIDDEN)
+		end
 		if sessionState then
 			results_hud.Show(sessionState)
 		end
