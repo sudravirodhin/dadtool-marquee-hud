@@ -9,7 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.4.6] - 2026-06-17
 
+## [0.4.6] - 2026-06-17
+
 ### Fixed
+
 - Star Rating Projection Build-up: Resolved the issue where the live projected star rating `Proj` showed `—` throughout gameplay on low or normal-scoring tracks. Added standard default milestones for passing 1-star (`40k`) and 2-star (`80k`) thresholds so the rating updates progressively from the start of the song. Also implemented an asynchronous retry counter inside `Accumulate` to attempt star threshold metadata discovery up to 5 times (over 2 seconds) to handle game playthrough data initialization delays.
 
 ## [0.4.5] - 2026-06-17
@@ -139,7 +142,8 @@ _DiscoTracker upstream history below._
 - Accuracy and Combo monitoring.
 - HighScore persistence.
 
-[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.5...HEAD
+[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.6...HEAD
+[0.4.6]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.5...v0.4.6
 [0.4.5]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.4...v0.4.5
 [0.4.4]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v1.2.1...v0.4.4
 [1.2.1]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v1.2.0...v1.2.1
