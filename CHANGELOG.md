@@ -9,7 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.4.5] - 2026-06-17
 
+## [0.4.5] - 2026-06-17
+
 ### Fixed
+
 - Missing Move Data at Results: Fixed the issue where no move data was displayed on the results screen. Because mid-combat polling was disabled, and the game clears `CombatActionScores` immediately upon song completion before the UI constructs, the results screen hooks were reading an empty map. Restored move data capturing by polling `ReadMoveScores` safely during the song's ending window (the last 3 seconds of the track). During this window, combat has ceased, making it safe from concurrent mutation crashes, while the score component and map are still fully intact before the level transitions.
 
 ## [0.4.4] - 2026-06-17
@@ -133,7 +136,8 @@ _DiscoTracker upstream history below._
 - Accuracy and Combo monitoring.
 - HighScore persistence.
 
-[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.4...HEAD
+[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.5...HEAD
+[0.4.5]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.4...v0.4.5
 [0.4.4]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v1.2.1...v0.4.4
 [1.2.1]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v1.1.6...v1.2.0
