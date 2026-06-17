@@ -70,3 +70,6 @@ luac.out
 # === OS ===
 .DS_Store
 Thumbs.db
+
+# === UE4SS C++ Development and Reverse Engineering ===
+ue4ss-dev/
