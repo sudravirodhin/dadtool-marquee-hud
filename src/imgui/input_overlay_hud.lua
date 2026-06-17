@@ -9,6 +9,8 @@ local umg_factory = require("utils.umg_factory")
 M.hudWidget = nil
 M.borderWidget = nil
 M.buttons = {} -- stores key definitions and widget handles
+M.jsThumbSlot = nil
+M.jsThumbWidget = nil
 
 -- Pre-cached FName instances for analog/dpad/triggers to avoid heap allocations
 M.fnameLeftX = nil
@@ -126,18 +128,30 @@ function M.Create()
 	scrollWheel:SetPadding({ Left = 0, Top = 0, Right = 0, Bottom = 0 })
 	Place(scrollWheel, 96, 11, 2, 10)
 
-	-- 3. Gamepad Cluster (X=130 to X=190, Y=0 to Y=74)
+	-- 3. Gamepad Cluster (X=114 to X=194, Y=0 to Y=74, widened to 80px for Joystick placement)
 	-- Gamepad plate background
 	local gpBody = StaticConstructObject(StaticFindObject("/Script/UMG.Border"), innerCanvas, FName("Gamepad_Body"))
 	gpBody:SetBrushColor(hud_utils.FLinearColor(0.02, 0.02, 0.04, 0.25))
 	gpBody:SetPadding({ Left = 0, Top = 0, Right = 0, Bottom = 0 })
-	Place(gpBody, 130, 0, 56, 74)
+	Place(gpBody, 114, 0, 80, 74)
 
-	-- Bumpers / Triggers: L1/L2 and R1/R2
-	local l1Border, l1Text = CreateKey("GpL1", "L1", 6) Place(l1Border, 130, 3, 26, 8)
-	local l2Border, l2Text = CreateKey("GpL2", "L2", 6) Place(l2Border, 130, 12, 26, 8)
-	local r1Border, r1Text = CreateKey("GpR1", "R1", 6) Place(r1Border, 160, 3, 26, 8)
-	local r2Border, r2Text = CreateKey("GpR2", "R2", 6) Place(r2Border, 160, 12, 26, 8)
+	-- Bumpers / Triggers: L1/L2 and R1/R2 (placed wider on the 80px body)
+	local l1Border, l1Text = CreateKey("GpL1", "L1", 6) Place(l1Border, 114, 3, 38, 8)
+	local l2Border, l2Text = CreateKey("GpL2", "L2", 6) Place(l2Border, 114, 12, 38, 8)
+	local r1Border, r1Text = CreateKey("GpR1", "R1", 6) Place(r1Border, 156, 3, 38, 8)
+	local r2Border, r2Text = CreateKey("GpR2", "R2", 6) Place(r2Border, 156, 12, 38, 8)
+
+	-- Left Analog Joystick (Visual representation)
+	local jsGate = StaticConstructObject(StaticFindObject("/Script/UMG.Border"), innerCanvas, FName("Gp_Joystick_Gate"))
+	jsGate:SetBrushColor(hud_utils.FLinearColor(0.01, 0.01, 0.02, 0.5))
+	jsGate:SetPadding({ Left = 0, Top = 0, Right = 0, Bottom = 0 })
+	Place(jsGate, 122, 35, 24, 24)
+
+	local jsThumb = StaticConstructObject(StaticFindObject("/Script/UMG.Border"), innerCanvas, FName("Gp_Joystick_Thumb"))
+	jsThumb:SetBrushColor(hud_utils.FLinearColor(0.2, 0.2, 0.3, 0.8))
+	jsThumb:SetPadding({ Left = 0, Top = 0, Right = 0, Bottom = 0 })
+	M.jsThumbSlot = Place(jsThumb, 129, 42, 10, 10)
+	M.jsThumbWidget = jsThumb
 
 	-- Helper to create gamepad face buttons
 	local function CreateGpBtn(name, label, color)
@@ -155,11 +169,11 @@ function M.Create()
 		return b, t
 	end
 
-	-- Diamond Layout (symmetrical center (156, 47))
-	local gpYBorder, gpYText = CreateGpBtn("GpY", "Y", COLOR_GP_Y_INACTIVE) Place(gpYBorder, 148, 23, 16, 16)
-	local gpXBorder, gpXText = CreateGpBtn("GpX", "X", COLOR_GP_X_INACTIVE) Place(gpXBorder, 132, 39, 16, 16)
-	local gpBBorder, gpBText = CreateGpBtn("GpB", "B", COLOR_GP_B_INACTIVE) Place(gpBBorder, 164, 39, 16, 16)
-	local gpABorder, gpAText = CreateGpBtn("GpA", "A", COLOR_GP_A_INACTIVE) Place(gpABorder, 148, 55, 16, 16)
+	-- Diamond Layout (symmetrical center (171, 47) on the right side)
+	local gpYBorder, gpYText = CreateGpBtn("GpY", "Y", COLOR_GP_Y_INACTIVE) Place(gpYBorder, 163, 23, 16, 16)
+	local gpXBorder, gpXText = CreateGpBtn("GpX", "X", COLOR_GP_X_INACTIVE) Place(gpXBorder, 147, 39, 16, 16)
+	local gpBBorder, gpBText = CreateGpBtn("GpB", "B", COLOR_GP_B_INACTIVE) Place(gpBBorder, 179, 39, 16, 16)
+	local gpABorder, gpAText = CreateGpBtn("GpA", "A", COLOR_GP_A_INACTIVE) Place(gpABorder, 163, 55, 16, 16)
 
 	-- Setup buttons array with cached FName instances
 	M.buttons = {
@@ -225,6 +239,25 @@ function M.Update(pc)
 	if leftX == 0 and leftY == 0 then
 		leftX = stickX
 		leftY = stickY
+	end
+
+	-- Update visual joystick thumb position and color dynamically
+	if M.jsThumbSlot and M.jsThumbSlot:IsValid() then
+		pcall(function()
+			-- Center is (129, 42), max deflection is 6 pixels inside the 24x24 gate
+			local targetX = 129 + (leftX * 6)
+			local targetY = 42 - (leftY * 6) -- Invert Y because UP is negative Y in screen coordinates
+			M.jsThumbSlot:SetPosition({ X = targetX, Y = targetY })
+
+			local isDeflected = (math.abs(leftX) > 0.15 or math.abs(leftY) > 0.15)
+			if M.jsThumbWidget and M.jsThumbWidget:IsValid() then
+				if isDeflected then
+					M.jsThumbWidget:SetBrushColor(hud_utils.FLinearColor(0.0, 0.9, 1.0, 0.9)) -- Electric Cyan
+				else
+					M.jsThumbWidget:SetBrushColor(hud_utils.FLinearColor(0.2, 0.2, 0.3, 0.8)) -- Slate Grey
+				end
+			end
+		end)
 	end
 
 	-- 2. Process all mapped buttons
@@ -320,6 +353,8 @@ function M.Destroy()
 	M.fnameDPadDown = nil
 	M.fnameDPadLeft = nil
 	M.fnameDPadRight = nil
+	M.jsThumbSlot = nil
+	M.jsThumbWidget = nil
 end
 
 function M.SetVisibility(visibility)

@@ -134,11 +134,13 @@ function M.SetState(newState, sessionState)
 		ensureStats()
 		if liveState.IsTrackerVisible then
 			in_game_progress_hud.SetVisibility(hud_utils.Visibility.HITTESTINVISIBLE)
-			if cfg.INPUT_OVERLAY_ENABLED then
-				input_overlay_hud.SetVisibility(hud_utils.Visibility.HITTESTINVISIBLE)
-			end
 		else
 			in_game_progress_hud.SetVisibility(hud_utils.Visibility.HIDDEN)
+		end
+
+		if cfg.INPUT_OVERLAY_ENABLED then
+			input_overlay_hud.SetVisibility(hud_utils.Visibility.HITTESTINVISIBLE)
+		else
 			input_overlay_hud.SetVisibility(hud_utils.Visibility.HIDDEN)
 		end
 
@@ -181,11 +183,18 @@ function M.Sync(sessionState)
 	-- hide stats while paused (they overlap the pause menu)
 	if liveState.IsTrackerVisible and not isSongPaused() then
 		in_game_progress_hud.SetVisibility(hud_utils.Visibility.HITTESTINVISIBLE)
-		if cfg.INPUT_OVERLAY_ENABLED then
-			input_overlay_hud.SetVisibility(hud_utils.Visibility.HITTESTINVISIBLE)
-		end
 	else
 		in_game_progress_hud.SetVisibility(hud_utils.Visibility.HIDDEN)
+	end
+
+	-- input overlay visibility is independent of tracker visibility
+	if cfg.INPUT_OVERLAY_ENABLED then
+		if not isSongPaused() then
+			input_overlay_hud.SetVisibility(hud_utils.Visibility.HITTESTINVISIBLE)
+		else
+			input_overlay_hud.SetVisibility(hud_utils.Visibility.HIDDEN)
+		end
+	else
 		input_overlay_hud.SetVisibility(hud_utils.Visibility.HIDDEN)
 	end
 end
