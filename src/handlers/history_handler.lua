@@ -13,6 +13,10 @@ local BAK_PATH = SAVE_PATH .. ".bak"   -- last-good copy; recovers PBs if the ma
 local function _getCleanPrimaryKey(session)
 	if session.SongUniqueID and session.SongUniqueID ~= 0
 		and session.SongUniqueID ~= "" and session.SongUniqueID ~= "0" then
+		local num = tonumber(session.SongUniqueID)
+		if num then
+			return string.format("%.0f", num)
+		end
 		return tostring(session.SongUniqueID)
 	end
 

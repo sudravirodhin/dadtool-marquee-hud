@@ -122,6 +122,24 @@ end
 
 function M.Tick()
   if not M.enabled then return end
+
+  -- 1. Refresh metadata if needed (e.g., if we are early in the song or have unpopulated ID)
+  local state = _G.__SessionAggAccuracy
+  if state then
+    local needsRefresh = not state.SongUniqueID or state.SongUniqueID == 0 or state.SongUniqueID == "0" or state.SongUniqueID == "" or state.SongName == "No Song"
+    if needsRefresh and _G.CaptureSongMetadata then
+      pcall(_G.CaptureSongMetadata)
+    end
+
+    -- 2. Detect song changes or late-loading song metadata (reload lyrics if key changes)
+    local info = resolver.Resolve(state)
+    local key = info and info.key or nil
+    if key and key ~= M._songKey then
+      log.info(string.format("[lyrics] song key changed (%s -> %s), reloading lyrics...", tostring(M._songKey), tostring(key)))
+      M.OnSongStart(state)
+    end
+  end
+
   if not lyrics_hud.IsValid() then return end
 
   -- fade the transient notice (runs even when no song lyrics are active)

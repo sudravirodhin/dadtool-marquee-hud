@@ -31,7 +31,10 @@ end
 -- Cached synced lyrics text for a key, or nil.
 function M.LoadLrc(key)
   if not key or key == "" then return nil end
-  return readFile(DIR .. key .. ".lrc")
+  local path = DIR .. key .. ".lrc"
+  local content = readFile(path)
+  log.debug(string.format("[lyrics] LoadLrc key=%s path=%s content_len=%s", tostring(key), tostring(path), tostring(content and #content or "nil")))
+  return content
 end
 
 -- Have we already recorded "no synced lyrics available" for this key?

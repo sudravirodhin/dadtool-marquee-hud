@@ -80,6 +80,7 @@ local function CaptureSongMetadata()
 		end
 	end)
 end
+_G.CaptureSongMetadata = CaptureSongMetadata
 
 --[[ ============ SONG LIFECYCLE ============ --]]
 local function OnSongStart()

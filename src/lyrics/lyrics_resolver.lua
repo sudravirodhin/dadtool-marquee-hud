@@ -28,6 +28,10 @@ end
 local function cleanKey(state)
   local uid = state.SongUniqueID
   if uid and uid ~= 0 and uid ~= "" and uid ~= "0" then
+    local num = tonumber(uid)
+    if num then
+      return string.format("%.0f", num)
+    end
     return tostring(uid)
   end
   if state.AssetPath and state.AssetPath ~= "" then
