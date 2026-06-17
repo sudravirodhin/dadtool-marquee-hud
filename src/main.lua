@@ -50,32 +50,48 @@ _G.__SessionAggAccuracy = _G.__SessionAggAccuracy or {
 }
 
 --[[ ============ SONG IDENTITY (for lyrics + history key) ============ --]]
+local _musicSubsys = nil
+local function GetMusicSubsystem()
+	if _musicSubsys then
+		local ok, valid = pcall(function() return _musicSubsys:IsValid() end)
+		if ok and valid then return _musicSubsys end
+	end
+	local insts = FindAllOf("PagodaMusicSubsystem")
+	_musicSubsys = (insts and insts[1]) or nil
+	return _musicSubsys
+end
+
 local function CaptureSongMetadata()
 	local state = _G.__SessionAggAccuracy
 	pcall(function()
-		local musicInsts = FindAllOf("PagodaMusicSubsystem")
-		if musicInsts and #musicInsts > 0 then
-			local currentSong = musicInsts[1]:GetCurrentSong()
+		local subsys = GetMusicSubsystem()
+		if subsys then
+			local currentSong = subsys:GetCurrentSong()
 			if currentSong and currentSong:IsValid() then
-				state.SongName = currentSong.SongName:ToString()
-				state.AssetPath = currentSong:GetFullName()
-				state.SongUniqueID = currentSong:GetImportedSongUniqueID()
-				pcall(function() state.SongLengthSec = musicInsts[1]:GetSongLengthSeconds() end)
-				pcall(function() state.SongIsImported = currentSong.bImportedSong end)
-				pcall(function()
-					-- NEVER index a TArray without a length check: pb[1] on an empty
-					-- PerformedBy (custom songs) is an out-of-bounds native crash.
-					local pb = currentSong.PerformedBy
-					local n = (pb and #pb) or 0
-					if type(n) == "number" and n >= 1 then
-						local first = pb[1]
-						if first ~= nil then
-							state.SongArtist = (type(first) == "userdata" and first.ToString and first:ToString()) or tostring(first)
+				local newUID = currentSong:GetImportedSongUniqueID()
+				local newName = currentSong.SongName:ToString()
+				-- Only update and log if the song unique ID or name has changed
+				if newUID ~= state.SongUniqueID or newName ~= state.SongName then
+					state.SongName = newName
+					state.AssetPath = currentSong:GetFullName()
+					state.SongUniqueID = newUID
+					pcall(function() state.SongLengthSec = subsys:GetSongLengthSeconds() end)
+					pcall(function() state.SongIsImported = currentSong.bImportedSong end)
+					pcall(function()
+						-- NEVER index a TArray without a length check: pb[1] on an empty
+						-- PerformedBy (custom songs) is an out-of-bounds native crash.
+						local pb = currentSong.PerformedBy
+						local n = (pb and #pb) or 0
+						if type(n) == "number" and n >= 1 then
+							local first = pb[1]
+							if first ~= nil then
+								state.SongArtist = (type(first) == "userdata" and first.ToString and first:ToString()) or tostring(first)
+							end
 						end
-					end
-				end)
-				log.debug(string_format("CURRENT SONG: %s | %s | %s",
-					tostring(state.SongUniqueID), state.SongName, state.AssetPath))
+					end)
+					log.info(string_format("CURRENT SONG changed: %s | %s | %s",
+						tostring(state.SongUniqueID), state.SongName, state.AssetPath))
+				end
 			end
 		end
 	end)

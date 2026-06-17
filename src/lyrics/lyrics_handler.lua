@@ -16,6 +16,8 @@ local store = require("lyrics.lyrics_store")
 local lrc = require("lyrics.lrc")
 local engine = require("lyrics.lyrics_engine")
 local lyrics_hud = require("lyrics.lyrics_hud")
+local hud_handler = require("handlers.hud_handler")
+
 
 -- DEBUG: last Tick stage, written to a file so a native crash localizes precisely.
 local STAGE = "./ue4ss/Mods/Marquee/Scripts/data/lyrics/_tick_stage.txt"
@@ -122,12 +124,16 @@ end
 
 function M.Tick()
   if not M.enabled then return end
+  if not hud_handler or hud_handler.CurrentState ~= hud_handler.States.IN_GAME then return end
+
+  M._tickCount = (M._tickCount or 0) + 1
 
   -- 1. Refresh metadata if needed (e.g., if we are early in the song or have unpopulated ID)
   local state = _G.__SessionAggAccuracy
   if state then
     local needsRefresh = not state.SongUniqueID or state.SongUniqueID == 0 or state.SongUniqueID == "0" or state.SongUniqueID == "" or state.SongName == "No Song"
-    if needsRefresh and _G.CaptureSongMetadata then
+    -- Only try to refresh for the first ~5 seconds (80 ticks) to avoid ongoing CPU overhead
+    if needsRefresh and M._tickCount < 80 and _G.CaptureSongMetadata then
       pcall(_G.CaptureSongMetadata)
     end
 
