@@ -3,6 +3,10 @@
   <p><i>Synced lyrics + DaD-native performance tracking for <b>Dead as Disco</b> (UE4SS Lua mod)</i></p>
 </div>
 
+> [!IMPORTANT]
+> **AI Assistance Disclosure & Disclaimer**
+> This project was developed with the assistance of an AI Large Language Model (LLM). It is a purely personal, non-profit project built for fun to speed up development and make it easier to enjoy the game. If you are not comfortable using software that has been touched or written with the help of AI, please do not proceed.
+
 **Marquee** adds a karaoke-style synced-lyrics bar, performance tracking built on the game's *own* scoring (Score / Combo / Sync / Stars), session leveling, a post-song report, and a Career Stats panel to *Dead as Disco*.
 
 It is a fork of **[DiscoTracker](https://github.com/lucashort7/dad-performance-tracker)** by *hort (lucashort7)*, rebuilt around two ideas: read the game's real combat tallies instead of inventing hit-accuracy, and put the lyrics on screen.
