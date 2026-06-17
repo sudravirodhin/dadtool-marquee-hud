@@ -9,6 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.4.8] - 2026-06-17
 
+### Added
+
+- Gamepad Input Overlay Expansion: Added full support for gamepad face buttons (Y, B), shoulder bumpers (L1, R1), and analog triggers (L2, R2). Sized up the graphical layout to 200x80 and shifted keys down to arrange buttons in a clean, symmetrical format.
+- Joystick & Trigger Polling Fallbacks: Implemented fallback left analog stick polling using `GetInputAnalogStickState` and trigger axis polling (`Gamepad_LeftTriggerAxis` / `Gamepad_RightTriggerAxis` via `GetInputAnalogKeyState`) to ensure analog joystick movement and trigger presses accurately light up the overlay buttons.
+- Input Diagnostic Logging: Added a throttled input diagnostic logger that prints active keys, analog trigger values, and stick coordinates to `UE4SS.log` once per second when input is active.
+
 ### Changed
 
 - Input Overlay F5 Keybind: Pivoted the `F5` keybind to toggle the visual input overlay widget on/off dynamically in real time. The 30ms polling sync loop now runs unconditionally, check-gating the toggle state inside the loop to avoid boot-time load constraints.
