@@ -17,7 +17,8 @@ function M.Create()
 	if not hud then return end
 
 	local canvas = umg_factory.CreateCanvas(hud.WidgetTree, "InGameProgressCanvas")
-	local vBox = umg_factory.CreateVerticalBox(canvas, "StatsVerticalBox")
+	local border = umg_factory.CreateBorder(canvas, "InGameProgressBorder")
+	local vBox = umg_factory.CreateVerticalBox(border, "StatsVerticalBox")
 
 	local function row(label, key, valColor)
 		local hBox = umg_factory.CreateHorizontalBox(vBox, "HBox_" .. key)
@@ -33,8 +34,6 @@ function M.Create()
 	-- Only the two things the native HUD does NOT show: your PB to beat + a live sync %.
 	row("PB    ", "pb")
 	row("Sync  ", "sync", hud_utils.SyncColor(1))
-
-	local border = umg_factory.CreateBorder(canvas, "InGameProgressBorder", { content = vBox })
 	umg_factory.ApplyAlignment(canvas, border, cfg.HUD_MAIN_ALLIGNMENT or "topright",
 		{ X = cfg.HUD_POS_X or -25, Y = cfg.HUD_POS_Y or 95 })
 

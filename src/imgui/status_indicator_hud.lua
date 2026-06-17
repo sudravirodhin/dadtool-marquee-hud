@@ -13,10 +13,13 @@ function M.Create()
 	end
 
 	local canvas = umg_factory.CreateCanvas(hud.WidgetTree, "ModStatusCanvas")
-	local vBox = umg_factory.CreateVerticalBox(canvas, "StatusVBox")
+	local border = umg_factory.CreateBorder(canvas, "StatusBorder", {
+		padding = { Left = 8, Top = 2, Right = 8, Bottom = 2 },
+		brushColor = hud_utils.FLinearColor(0, 0, 0, 0.22),
+	})
+	local vBox = umg_factory.CreateVerticalBox(border, "StatusVBox")
 
 	local hBox = umg_factory.CreateHorizontalBox(vBox, "StatusHBox")
-	vBox:AddChild(hBox)
 
 	umg_factory.CreateTextBlock(hBox, "StatusLabel", {
 		size = 9,
@@ -47,12 +50,6 @@ function M.Create()
 		size = 8,
 		text = "press F6 for stats",
 		color = hud_utils.FSlateColor(0.55, 0.85, 1, 0.6),
-	})
-
-	local border = umg_factory.CreateBorder(canvas, "StatusBorder", {
-		content = vBox,
-		padding = { Left = 8, Top = 2, Right = 8, Bottom = 2 },
-		brushColor = hud_utils.FLinearColor(0, 0, 0, 0.22),
 	})
 
 	umg_factory.ApplyAlignment(canvas, border, "bottomright")

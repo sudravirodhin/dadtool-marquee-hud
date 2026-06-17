@@ -20,7 +20,11 @@ function M.Create()
   if not hud then return end
 
   local canvas = umg_factory.CreateCanvas(hud.WidgetTree, "LyricsCanvas")
-  local vBox = umg_factory.CreateVerticalBox(canvas, "LyricsVBox")
+  local border = umg_factory.CreateBorder(canvas, "LyricsBorder", {
+    brushColor = hud_utils.FLinearColor(0, 0, 0, 0.28),
+    padding = { Left = 18, Top = 6, Right = 18, Bottom = 6 },
+  })
+  local vBox = umg_factory.CreateVerticalBox(border, "LyricsVBox")
 
   local cur = umg_factory.CreateTextBlock(vBox, "Lyrics_Current", {
     size = cfg.LYRICS_FONT_SIZE or 20,
@@ -43,12 +47,6 @@ function M.Create()
   pcall(function() nxt:SetJustification(1) end)
 
   M.curText, M.nextText = cur, nxt
-
-  local border = umg_factory.CreateBorder(canvas, "LyricsBorder", {
-    content = vBox,
-    brushColor = hud_utils.FLinearColor(0, 0, 0, 0.28),
-    padding = { Left = 18, Top = 6, Right = 18, Bottom = 6 },
-  })
   umg_factory.ApplyAlignment(canvas, border, cfg.LYRICS_ALIGNMENT or "bottom",
     { X = cfg.LYRICS_POS_X or 0, Y = cfg.LYRICS_POS_Y or -70 })
 

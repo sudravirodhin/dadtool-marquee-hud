@@ -65,7 +65,11 @@ function M.Show()
   local hud = umg_factory.CreateHUD("CareerStatsHUD")
   if not hud then return end
   local canvas = umg_factory.CreateCanvas(hud.WidgetTree, "StatsCanvas")
-  local vBox = umg_factory.CreateVerticalBox(canvas, "StatsVBox")
+  local border = umg_factory.CreateBorder(canvas, "StatsBorder", {
+    brushColor = hud_utils.FLinearColor(0, 0, 0, 0.6),
+    padding = { Left = 64, Top = 26, Right = 64, Bottom = 26 },
+  })
+  local vBox = umg_factory.CreateVerticalBox(border, "StatsVBox")
 
   local s = aggregate()
 
@@ -121,12 +125,6 @@ function M.Show()
 
   umg_factory.CreateTextBlock(vBox, "Sp_close", { size = 12, text = " " })
   umg_factory.CreateTextBlock(vBox, "Close", { size = 9, text = "press F6 to close", color = hud_utils.FSlateColor(1, 1, 1, 0.4) })
-
-  local border = umg_factory.CreateBorder(canvas, "StatsBorder", {
-    content = vBox,
-    brushColor = hud_utils.FLinearColor(0, 0, 0, 0.6),
-    padding = { Left = 64, Top = 26, Right = 64, Bottom = 26 },
-  })
   umg_factory.ApplyAlignment(canvas, border, "center", { X = 0, Y = 0 })
 
   hud.Visibility = hud_utils.Visibility.HITTESTINVISIBLE

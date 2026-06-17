@@ -174,14 +174,14 @@ local function renderRightColumn(container, s)
 	local pbScore = (s.CachedPB and s.CachedPB.highScore) or 0
 	if (s.TotalScore or 0) > pbScore then
 		local pbHBox = umg_factory.CreateHorizontalBox(box, "PBBadgeHBox")
-		local pbText = umg_factory.CreateTextBlock(pbHBox, "NewPBText", {
+		local pbBorder = umg_factory.CreateBorder(pbHBox, "NewPBBorder", {
+			brushColor = hud_utils.FLinearColor(0.69, 0.15, 1, 0.8),
+			padding = { Left = 8, Top = 2, Right = 8, Bottom = 2 },
+		})
+		local pbText = umg_factory.CreateTextBlock(pbBorder, "NewPBText", {
 			size = 13, text = " NEW HIGH SCORE! ",
 			color = hud_utils.FSlateColor(1, 1, 1, 1), skew = 0.1,
 			shadowOffset = { X = 1, Y = 1 }, shadowColor = hud_utils.FLinearColor(0, 0, 0, 1),
-		})
-		umg_factory.CreateBorder(pbHBox, "NewPBBorder", {
-			content = pbText, brushColor = hud_utils.FLinearColor(0.69, 0.15, 1, 0.8),
-			padding = { Left = 8, Top = 2, Right = 8, Bottom = 2 },
 		})
 	end
 end
@@ -199,7 +199,11 @@ function M.Show(summary)
 	if not hud then return end
 
 	local canvas = umg_factory.CreateCanvas(hud.WidgetTree, "ResultsCanvas")
-	local mainVBox = umg_factory.CreateVerticalBox(canvas, "ResultsMainVBox")
+	local border = umg_factory.CreateBorder(canvas, "ResultsBorder", {
+		brushColor = hud_utils.FLinearColor(0, 0, 0, 0.5),
+		padding = { Left = 40, Top = 20, Right = 40, Bottom = 20 },
+	})
+	local mainVBox = umg_factory.CreateVerticalBox(border, "ResultsMainVBox")
 
 	renderHeader(mainVBox, summary.SongName)
 
@@ -207,12 +211,6 @@ function M.Show(summary)
 	renderLeftColumn(columnsHBox, summary)
 	umg_factory.CreateTextBlock(columnsHBox, "ColumnSpacer", { size = 40, text = "      " })
 	renderRightColumn(columnsHBox, summary)
-
-	local border = umg_factory.CreateBorder(canvas, "ResultsBorder", {
-		content = mainVBox,
-		brushColor = hud_utils.FLinearColor(0, 0, 0, 0.5),
-		padding = { Left = 40, Top = 20, Right = 40, Bottom = 20 },
-	})
 	umg_factory.ApplyAlignment(canvas, border, cfg.RESULTS_ALIGNMENT or "center",
 		{ X = cfg.RESULTS_POS_X or 0, Y = cfg.RESULTS_POS_Y or 40 })
 
