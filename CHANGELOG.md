@@ -9,10 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.4.8] - 2026-06-17
 
+### Changed
+
+- Input Overlay F5 Keybind: Pivoted the `F5` keybind to toggle the visual input overlay widget on/off dynamically in real time. The 30ms polling sync loop now runs unconditionally, check-gating the toggle state inside the loop to avoid boot-time load constraints.
+
 ### Fixed
 
+- HUD Sync Loop Scoping Crash: Fixed a Lua runtime error (`attempt to call a nil value (global 'discoverStarThresholds')` in `combat_stats.lua` at line 157) that completely terminated the HUD sync loop on the first gameplay tick. Relocated `discoverStarThresholds` above `M.Accumulate` so it is in lexical scope, restoring the live projected stars calculation, PB ghost delta, and Hype updates.
 - Input Overlay F5 and Key Query Crash: Fixed native ACCESS_VIOLATION crash (`0xc0000005` in `UE4SS.dll` during `push_nameproperty` Set operation) when executing the temporary `F5` input test keybind or running the input overlay. Passing a raw Lua string (e.g. `"W"`) where the Unreal Engine `FKey` struct parameter expects an `FName` caused a type casting fault inside `LuaUObject.cpp` at line 1645. Solved by wrapping all key strings in the global `FName` constructor (`FName("W")`).
 - Input Overlay Syntax Fix: Restored the missing loop header (`for _, b in ipairs(M.buttons) do`) and local variable scoping inside `input_overlay_hud.lua` that broke the sync loop syntax.
+- Hype Status Emoji Render: Removed the fire emoji (🔥) from `"ON FIRE"` to prevent rendering issues where standard/default game fonts would display it as a white square or a `?` inside a diamond.
 
 ## [0.4.7] - 2026-06-17
 

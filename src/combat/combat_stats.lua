@@ -103,6 +103,64 @@ function M.SyncFraction(snap)
   return math.max(0, math.min(1, snap.sync / mx))
 end
 
+-- Find and cache the star score thresholds for the current song.
+local function discoverStarThresholds(state)
+  state.StarThresholds = nil
+  local ps = playerState()
+  if not ps then return end
+  local pd = safe(function() return ps.PlaythroughData end)
+  local subsys = GetMusicSubsystem()
+  local song = subsys and safe(function() return subsys:GetCurrentSong() end)
+
+  if not pd or not is_indexable(pd) then return end
+
+  -- 1. Try to read array-like properties
+  for _, name in ipairs({"StarThresholds", "ScoreThresholds", "StarsThresholds"}) do
+    local arr = safe(function() return pd[name] end) or (song and is_indexable(song) and safe(function() return song[name] end))
+    if arr and is_indexable(arr) then
+      local t = {}
+      pcall(function()
+        arr:ForEach(function(_, e)
+          local val = safe(function() return e:get() end) or e
+          if type(val) == "number" then table.insert(t, val) end
+        end)
+      end)
+      if #t > 0 then
+        state.StarThresholds = t
+        log.info(string.format("[combat] Found star thresholds in array %s: %s", name, table.concat(t, ", ")))
+        return
+      end
+    end
+  end
+
+  -- 2. Try to read individual properties for stars 1 to 5
+  local t = {}
+  local foundAny = false
+  for i = 1, 5 do
+    local field_names = {
+      string.format("ScoreThreshold%d", i),
+      string.format("StarThreshold%d", i),
+      string.format("ScoreFor%dStars", i),
+      string.format("%dStarScore", i),
+      string.format("%dStarThreshold", i),
+    }
+    for _, name in ipairs(field_names) do
+      local val = safe(function() return pd[name] end) or (song and is_indexable(song) and safe(function() return song[name] end))
+      if type(val) == "number" then
+        t[i] = val
+        foundAny = true
+        break
+      end
+    end
+  end
+  if foundAny then
+    state.StarThresholds = t
+    log.info(string.format("[combat] Found star thresholds in individual fields: 1*=%s, 2*=%s, 3*=%s, 4*=%s, 5*=%s",
+      tostring(t[1]), tostring(t[2]), tostring(t[3]), tostring(t[4]), tostring(t[5])))
+    return
+  end
+end
+
 --[[ ---- running accumulation (folds a snapshot into the session state) ----
   Builds the avg/peak sync + "time at max sync" streak that stand in for
   "concurrent perfects", plus tracks the live max combo. Pure arithmetic. --]]
@@ -211,7 +269,7 @@ function M.Accumulate(state, snap)
     state.RecentSyncAvg = sum / #state.RecentSync
 
     if #state.RecentSync >= 5 and state.RecentSyncAvg >= 0.90 then
-      state.HypeStatus = "ON FIRE 🔥"
+      state.HypeStatus = "ON FIRE"
     else
       state.HypeStatus = "—"
     end
@@ -337,63 +395,7 @@ function M.CaptureFinal(state)
 end
 
 
--- Find and cache the star score thresholds for the current song.
-local function discoverStarThresholds(state)
-  state.StarThresholds = nil
-  local ps = playerState()
-  if not ps then return end
-  local pd = safe(function() return ps.PlaythroughData end)
-  local subsys = GetMusicSubsystem()
-  local song = subsys and safe(function() return subsys:GetCurrentSong() end)
 
-  if not pd or not is_indexable(pd) then return end
-
-  -- 1. Try to read array-like properties
-  for _, name in ipairs({"StarThresholds", "ScoreThresholds", "StarsThresholds"}) do
-    local arr = safe(function() return pd[name] end) or (song and is_indexable(song) and safe(function() return song[name] end))
-    if arr and is_indexable(arr) then
-      local t = {}
-      pcall(function()
-        arr:ForEach(function(_, e)
-          local val = safe(function() return e:get() end) or e
-          if type(val) == "number" then table.insert(t, val) end
-        end)
-      end)
-      if #t > 0 then
-        state.StarThresholds = t
-        log.info(string.format("[combat] Found star thresholds in array %s: %s", name, table.concat(t, ", ")))
-        return
-      end
-    end
-  end
-
-  -- 2. Try to read individual properties for stars 1 to 5
-  local t = {}
-  local foundAny = false
-  for i = 1, 5 do
-    local field_names = {
-      string.format("ScoreThreshold%d", i),
-      string.format("StarThreshold%d", i),
-      string.format("ScoreFor%dStars", i),
-      string.format("%dStarScore", i),
-      string.format("%dStarThreshold", i),
-    }
-    for _, name in ipairs(field_names) do
-      local val = safe(function() return pd[name] end) or (song and is_indexable(song) and safe(function() return song[name] end))
-      if type(val) == "number" then
-        t[i] = val
-        foundAny = true
-        break
-      end
-    end
-  end
-  if foundAny then
-    state.StarThresholds = t
-    log.info(string.format("[combat] Found star thresholds in individual fields: 1*=%s, 2*=%s, 3*=%s, 4*=%s, 5*=%s",
-      tostring(t[1]), tostring(t[2]), tostring(t[3]), tostring(t[4]), tostring(t[5])))
-    return
-  end
-end
 
 -- Reset the per-song accumulators (call at song start).
 function M.Reset(state)

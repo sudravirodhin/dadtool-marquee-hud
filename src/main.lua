@@ -223,20 +223,18 @@ LoopAsync(cfg.LYRICS_TICK_MS or 60, function()
 end)
 
 -- input overlay sync loop (high-frequency 30ms polling, runs only if enabled and playing)
-if cfg.INPUT_OVERLAY_ENABLED then
-	local input_overlay_hud = require("imgui.input_overlay_hud")
-	LoopAsync(30, function()
-		if hud_handler.CurrentState == hud_handler.States.IN_GAME then
-			ExecuteInGameThread(function()
-				local pc = UEHelpers.GetPlayerController()
-				if pc and pc:IsValid() then
-					pcall(input_overlay_hud.Update, pc)
-				end
-			end)
-		end
-		return false
-	end)
-end
+local input_overlay_hud = require("imgui.input_overlay_hud")
+LoopAsync(30, function()
+	if cfg.INPUT_OVERLAY_ENABLED and hud_handler.CurrentState == hud_handler.States.IN_GAME then
+		ExecuteInGameThread(function()
+			local pc = UEHelpers.GetPlayerController()
+			if pc and pc:IsValid() then
+				pcall(input_overlay_hud.Update, pc)
+			end
+		end)
+	end
+	return false
+end)
 
 -- Once the song catalog is loaded, dump the FULL manifest (_catalog.jsonl: every in-game +
 -- imported song's current key + meta) so dadtool always has the complete song list to generate
@@ -271,20 +269,22 @@ RegisterKeyBind(Key.F3, function()
 	hud_handler.UpdateModStatus(s)
 end)
 
--- Temporary input state query test
+-- F5: Toggle Input Overlay
 RegisterKeyBind(Key.F5, function()
-	pcall(function()
-		local pc = UEHelpers.GetPlayerController()
-		if pc and pc:IsValid() then
-			local keys = { "W", "A", "S", "D", "SpaceBar", "LeftMouseButton", "RightMouseButton", "Gamepad_FaceButton_Bottom", "Gamepad_FaceButton_Left" }
-			local status = {}
-			for _, kname in ipairs(keys) do
-				local isDown = pc:IsInputKeyDown({ KeyName = FName(kname) })
-				table.insert(status, string.format("%s=%s", kname, tostring(isDown)))
+	cfg.INPUT_OVERLAY_ENABLED = not cfg.INPUT_OVERLAY_ENABLED
+	ExecuteInGameThread(function()
+		local overlay = require("imgui.input_overlay_hud")
+		if cfg.INPUT_OVERLAY_ENABLED then
+			print("[Marquee] Input Overlay enabled via F5")
+			if not overlay.IsValid() then
+				overlay.Create()
 			end
-			print("[Input Test] " .. table.concat(status, " | "))
+			if hud_handler.CurrentState == hud_handler.States.IN_GAME and _G.__SessionAggAccuracy.IsTrackerVisible then
+				overlay.SetVisibility(hud_utils.Visibility.HITTESTINVISIBLE)
+			end
 		else
-			print("[Input Test] Player Controller is not valid")
+			print("[Marquee] Input Overlay disabled via F5")
+			overlay.Destroy()
 		end
 	end)
 end)

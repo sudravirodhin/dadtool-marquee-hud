@@ -98,7 +98,7 @@ function M.Update(state, snap)
 
 	-- 5. Hype status and flare-up indicator
 	if state and state.HypeStatus then
-		local is_on_fire = (state.HypeStatus == "ON FIRE 🔥")
+		local is_on_fire = (state.HypeStatus == "ON FIRE")
 		local color = is_on_fire and hud_utils.FSlateColor(1, 0.5, 0, 1) or hud_utils.FSlateColor(1, 1, 1, 0.5)
 		set("hype", state.HypeStatus, color)
 
