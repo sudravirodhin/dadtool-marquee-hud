@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-06-17
+
+### Added
+- Staged custom-compiled, stable `UE4SS` binaries inside the release package to bypass upstream loader crashes on game build `CL-29008`.
+- Safe `GetFirstTArrayElement` utility in `hud_utils.lua` to fetch and unwrap `PerformedBy` elements safely via native `ForEach` iteration.
+
+### Fixed
+- Garbage Collection crash: Fixed UMG layout GC crash (`0xc0000409` in `ucrtbase.dll`) by ensuring a strict, single-parent widget layout hierarchy across all 5 HUD definition files.
+- Subsystem / UObject transition crash: Added `is_indexable(obj)` verification checks to guard against property reads on nullptr/light userdata handles (`0xc0000005` in `UE4SS.dll`) during world/level transitions.
+- Catalog Manifest numeric fallback: Wrapped fallback `arr[i]` TArray indexing in `pcall` blocks to protect against out-of-bounds exceptions.
+
 ## [0.2.0] - 2026-06-16 — Marquee fork
 
 Fork of DiscoTracker, re-architected (see README). Re-versioned for the rebrand.
