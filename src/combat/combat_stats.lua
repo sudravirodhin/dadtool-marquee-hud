@@ -190,7 +190,6 @@ function M.CaptureFinal(state)
   if not state then return end
   local snap = M.Poll()
   M.Accumulate(state, snap)
-  if type(snap.score) == "number" then state.TotalScore = snap.score end
   -- max combo straight from the score component (we no longer poll combo each tick)
   local mc = safe(function() local s = scoreComp(); return s and s:GetMaxComboCount() end)
   if type(mc) == "number" then state.MaxCombo = mc end

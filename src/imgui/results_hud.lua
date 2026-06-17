@@ -12,11 +12,7 @@ do local ok, m = pcall(require, "leveling.leveling"); if ok then leveling = m en
 
 M.resultsWidget = nil
 
-local function commafy(n)
-	n = math.floor(tonumber(n) or 0)
-	local s = tostring(n):reverse():gsub("(%d%d%d)", "%1,"):reverse()
-	return (s:gsub("^,", ""))
-end
+
 
 -- best-effort prettify of a raw CombatActionScores key (exact format confirmed in-game;
 -- this strips enum scopes / GA_ wrappers and spaces camelCase so labels read cleanly).
@@ -31,14 +27,7 @@ local function prettyMove(raw)
 	return s
 end
 
-local function syncColor(frac)
-	frac = frac or 0
-	if frac >= 0.95 then return hud_utils.FSlateColor(0.69, 0.15, 1, 1)
-	elseif frac >= 0.85 then return hud_utils.FSlateColor(1, 1, 0, 1)
-	elseif frac >= 0.6 then return hud_utils.FSlateColor(0, 1, 0.5, 1)
-	elseif frac >= 0.3 then return hud_utils.FSlateColor(1, 0.6, 0, 1)
-	else return hud_utils.FSlateColor(1, 0.4, 0.4, 1) end
-end
+
 
 --[[ ============ RENDERERS ============ --]]
 local function renderHeader(container, songName)
@@ -61,7 +50,6 @@ end
 
 local function renderLeftColumn(container, s)
 	local box = umg_factory.CreateVerticalBox(container, "LeftVBox")
-	container:AddChild(box)
 
 	umg_factory.CreateTextBlock(box, "ComboLine", {
 		size = 16, text = string.format("Max Combo: %d", s.MaxCombo or 0),
@@ -74,7 +62,7 @@ local function renderLeftColumn(container, s)
 		text = string.format("Sync: %s avg  /  %s peak",
 			avg and string.format("%d%%", math.floor(avg * 100 + 0.5)) or "—",
 			peak and string.format("%d%%", math.floor(peak * 100 + 0.5)) or "—"),
-		color = syncColor(avg or 0),
+		color = hud_utils.SyncColor(avg or 0),
 	})
 
 	if (s.SyncStreakMax or 0) > 0 then
@@ -114,7 +102,6 @@ local function renderLeftColumn(container, s)
 				and prettyMove(nm) or ("Move " .. i)
 			local pct = (denom > 0) and (mv.score / denom * 100) or 0
 			local hBox = umg_factory.CreateHorizontalBox(box, "MoveHBox_" .. i)
-			box:AddChild(hBox)
 			umg_factory.CreateTextBlock(hBox, "MoveName_" .. i, {
 				size = 11, text = string.format("%s: ", label),
 			})
@@ -130,7 +117,6 @@ end
 -- a score here is redundant): the Marquee level/XP, the peak multiplier, and the personal-best flag.
 local function renderRightColumn(container, s)
 	local box = umg_factory.CreateVerticalBox(container, "RightVBox")
-	container:AddChild(box)
 
 	local lv = s.Leveling
 	if lv and leveling then
@@ -188,7 +174,6 @@ local function renderRightColumn(container, s)
 	local pbScore = (s.CachedPB and s.CachedPB.highScore) or 0
 	if (s.TotalScore or 0) > pbScore then
 		local pbHBox = umg_factory.CreateHorizontalBox(box, "PBBadgeHBox")
-		box:AddChild(pbHBox)
 		local pbText = umg_factory.CreateTextBlock(pbHBox, "NewPBText", {
 			size = 13, text = " NEW HIGH SCORE! ",
 			color = hud_utils.FSlateColor(1, 1, 1, 1), skew = 0.1,
@@ -201,35 +186,7 @@ local function renderRightColumn(container, s)
 	end
 end
 
-local function renderLevel(container, lv)
-	if not lv or not leveling then return end
-	umg_factory.CreateTextBlock(container, "LevelSpacer", { size = 14, text = " " })
-	if lv.leveledUp then
-		umg_factory.CreateTextBlock(container, "LevelUp", {
-			size = 22, text = string.format("LEVEL UP!   Lv%d — %s", lv.level, lv.title),
-			color = hud_utils.FSlateColor(1, 0.92, 0.3, 1),
-			fontPath = "/Game/Pagoda/UI/Fonts/Primary_Font.Primary_Font",
-			shadowOffset = { X = 2, Y = 2 }, shadowColor = hud_utils.FLinearColor(0, 0, 0, 1),
-		})
-	end
-	umg_factory.CreateTextBlock(container, "LevelLine", {
-		size = 15, text = string.format("Lv%d  %s    %s XP  (+%s)",
-			lv.level, lv.title, hud_utils.Abbrev(lv.totalXp), hud_utils.Abbrev(lv.xpGained)),
-		color = hud_utils.FSlateColor(1, 1, 1, 0.85),
-		fontPath = "/Game/Pagoda/UI/Fonts/Primary_Font.Primary_Font",
-	})
-	if lv.xpToNext and lv.nextTitle then
-		umg_factory.CreateTextBlock(container, "LevelNext", {
-			size = 11, text = string.format("Next: %s in %s XP", lv.nextTitle, hud_utils.Abbrev(lv.xpToNext)),
-			color = hud_utils.FSlateColor(0, 1, 1, 0.55),
-		})
-	else
-		umg_factory.CreateTextBlock(container, "LevelNext", {
-			size = 12, text = "MAX LEVEL — keep dancing",
-			color = hud_utils.FSlateColor(0.69, 0.15, 1, 0.9),
-		})
-	end
-end
+
 
 --[[ ============ CORE ============ --]]
 function M.Show(summary)
@@ -247,7 +204,6 @@ function M.Show(summary)
 	renderHeader(mainVBox, summary.SongName)
 
 	local columnsHBox = umg_factory.CreateHorizontalBox(mainVBox, "ColumnsHBox")
-	mainVBox:AddChild(columnsHBox)
 	renderLeftColumn(columnsHBox, summary)
 	umg_factory.CreateTextBlock(columnsHBox, "ColumnSpacer", { size = 40, text = "      " })
 	renderRightColumn(columnsHBox, summary)

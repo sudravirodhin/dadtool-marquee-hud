@@ -103,7 +103,6 @@ function M.Show()
   else
     for i, e in ipairs(s.favorites) do
       local hBox = umg_factory.CreateHorizontalBox(vBox, "FavH" .. i)
-      vBox:AddChild(hBox)
       umg_factory.CreateTextBlock(hBox, "FavN" .. i, { size = 12, text = clip(e.name, 46) .. "  ", color = hud_utils.FSlateColor(1, 1, 1, 0.85) })
       umg_factory.CreateTextBlock(hBox, "FavP" .. i, { size = 12, text = string.format("×%d", e.plays), color = hud_utils.FSlateColor(1, 0.82, 0.15, 0.9) })
     end
@@ -115,7 +114,6 @@ function M.Show()
   else
     for i, e in ipairs(s.topScores) do
       local hBox = umg_factory.CreateHorizontalBox(vBox, "TopH" .. i)
-      vBox:AddChild(hBox)
       umg_factory.CreateTextBlock(hBox, "TopN" .. i, { size = 12, text = clip(e.name, 42) .. "  ", color = hud_utils.FSlateColor(1, 1, 1, 0.85) })
       umg_factory.CreateTextBlock(hBox, "TopS" .. i, { size = 12, text = hud_utils.Abbrev(e.score), color = hud_utils.FSlateColor(0.4, 1, 0.6, 0.95) })
     end

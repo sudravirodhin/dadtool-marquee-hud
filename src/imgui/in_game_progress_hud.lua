@@ -1,4 +1,4 @@
---[[ in_game_progress_hud.lua — the live bottom-left panel.
+--[[ in_game_progress_hud.lua — the live in-game panel.
   Shows the game's OWN signals, polled (no hooks): Combo · Score · Sync% · ×Mult.
   Sync% is the rhythm gauge (MusicSyncMeter / max) — the DaD-native "how perfect am I". --]]
 local M = {}
@@ -10,21 +10,7 @@ local combat_stats = require("combat.combat_stats")
 M.progressWidget = nil
 M.controls = {}
 
--- color the sync readout by how pegged it is (electric-purple = nailing it, red = dropping)
-local function SyncColor(frac)
-	frac = frac or 0
-	if frac >= 0.95 then return hud_utils.FSlateColor(0.69, 0.15, 1, 1)
-	elseif frac >= 0.85 then return hud_utils.FSlateColor(1, 1, 0, 1)
-	elseif frac >= 0.6 then return hud_utils.FSlateColor(0, 1, 0.5, 1)
-	elseif frac >= 0.3 then return hud_utils.FSlateColor(1, 0.6, 0, 1)
-	else return hud_utils.FSlateColor(1, 0.4, 0.4, 1) end
-end
 
-local function commafy(n)
-	n = math.floor(tonumber(n) or 0)
-	local s = tostring(n):reverse():gsub("(%d%d%d)", "%1,"):reverse()
-	return (s:gsub("^,", ""))
-end
 
 function M.Create()
 	local hud = umg_factory.CreateHUD("InGameProgressHUD")
@@ -35,7 +21,6 @@ function M.Create()
 
 	local function row(label, key, valColor)
 		local hBox = umg_factory.CreateHorizontalBox(vBox, "HBox_" .. key)
-		vBox:AddChild(hBox)
 		umg_factory.CreateTextBlock(hBox, "Lbl_" .. key, {
 			size = 11, text = label, skew = 0.176,
 			shadowOffset = { X = 0.2, Y = 0.2 }, shadowColor = hud_utils.FLinearColor(0, 0, 0, 1),
@@ -47,7 +32,7 @@ function M.Create()
 
 	-- Only the two things the native HUD does NOT show: your PB to beat + a live sync %.
 	row("PB    ", "pb")
-	row("Sync  ", "sync", SyncColor(1))
+	row("Sync  ", "sync", hud_utils.SyncColor(1))
 
 	local border = umg_factory.CreateBorder(canvas, "InGameProgressBorder", { content = vBox })
 	umg_factory.ApplyAlignment(canvas, border, cfg.HUD_MAIN_ALLIGNMENT or "topright",
@@ -83,7 +68,7 @@ function M.Update(state, snap)
 	end
 	-- live sync % (the one rhythm number the game doesn't put on screen)
 	if frac then
-		set("sync", string.format("%d%%", math.floor(frac * 100 + 0.5)), SyncColor(frac))
+		set("sync", string.format("%d%%", math.floor(frac * 100 + 0.5)), hud_utils.SyncColor(frac))
 	else
 		set("sync", "—")
 	end

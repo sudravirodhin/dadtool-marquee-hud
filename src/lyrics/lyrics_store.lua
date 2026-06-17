@@ -1,10 +1,9 @@
 --[[ lyrics_store.lua — disk I/O for cached lyrics. Marquee is DISPLAY-ONLY: it reads
   LRCs but never produces them (the dadtool importer is the producer).
 
-  Reads cached "<key>.lrc"; records a "<key>.miss" marker (so we don't re-queue songs
-  known to have no synced lyrics); queues "no-lyrics-yet" notes to "_requests.jsonl"
-  (one JSON object per line) for the importer (dadtool `dad lyrics --queue`) to satisfy —
-  in practice only BUILT-IN game songs, since dadtool pre-produces imported ones.
+  Reads cached "<key>.lrc"; writes the full catalog manifest ("_catalog.jsonl") so
+  dadtool knows every song in the game. Per-song offset files (<key>.offset) persist
+  manual lyric-timing corrections made with F9/F10.
 
   Path convention matches history_handler (relative to the game working dir). --]]
 local log = require("utils.log")
@@ -13,7 +12,6 @@ local json = require("utils.json")
 local M = {}
 
 local DIR = "./ue4ss/Mods/Marquee/Scripts/data/lyrics/"
-local REQUESTS = DIR .. "_requests.jsonl"
 local CATALOG  = DIR .. "_catalog.jsonl"
 
 local function readFile(path)
@@ -48,7 +46,6 @@ function M.HasLrc(key)
   return exists(DIR .. key .. ".lrc")
 end
 
--- Append a fetch request (de-duped per session). `info` = resolver result.
 -- Per-song lyric timing offset in seconds (e.g. when the importer trimmed leading silence).
 function M.LoadOffset(key)
   if not key or key == "" then return 0 end
@@ -61,32 +58,7 @@ function M.SaveOffset(key, val)
   if f then f:write(tostring(val)); f:close() end
 end
 
-local queued = {}
-function M.QueueRequest(info)
-  local key = info and info.key
-  if not key or key == "" or queued[key] then return end
-  queued[key] = true
-
-  local ok, line = pcall(json.encode, {
-    key = info.key,
-    artist = info.artist or "",
-    title = info.title or "",
-    durationSec = info.durationSec or 0,
-    isImported = info.isImported and true or false,
-    songName = info.songName or "",
-  })
-  if not ok then return end
-
-  local f = io.open(REQUESTS, "a")
-  if not f then
-    log.debug("[lyrics] cannot open requests file: " .. REQUESTS)
-    return
-  end
-  f:write(line .. "\n")
-  f:close()
-  log.debug(string.format("[lyrics] queued fetch: %s - %s (%ss)",
-    tostring(info.artist), tostring(info.title), tostring(info.durationSec)))
-end
+-- QueueRequest removed: superseded by _catalog.jsonl manifest (see docs/IMPORTER_LRC_SPEC.md)
 
 -- Snapshot EVERY catalog song's current key + metadata in ONE bulk write per sweep, so
 -- dadtool's re-map can match current keys to orphaned <oldkey>.lrc after a game update

@@ -53,8 +53,9 @@ cfg.RESULTS_POS_Y = 90             -- + = lower in frame (nudged down to clear t
     ============ ~leveling cfg ============
 --]]
 cfg.LEVELING_ENABLED = true        -- track XP + levels and show them on the results screen
-cfg.XP_FULLCOMBO_BONUS = true      -- grant a bonus for a full-combo run
-cfg.XP_FULLCOMBO_BONUS_PCT = 10    -- +% XP when full combo
+-- ROADMAP: full-combo XP bonus (not yet implemented in leveling.XpForRun)
+-- cfg.XP_FULLCOMBO_BONUS = true      -- grant a bonus for a full-combo run
+-- cfg.XP_FULLCOMBO_BONUS_PCT = 10    -- +% XP when full combo
 -- cfg.LEVEL_TITLES = { ... }      -- optional override of the 20 level titles
 -- cfg.LEVEL_THRESHOLDS = { ... }  -- optional override of the cumulative XP curve
 

@@ -1,7 +1,5 @@
 local M = {}
 
-local UEHelpers = require("UEHelpers")
-
 M.Visibility = {
 	VISIBLE = 0,
 	COLLAPSED = 1,
@@ -15,29 +13,36 @@ M.Alignments = {
 	center = { anchor = { 0.5, 0.5 }, align = { 0.5, 0.5 }, pos = { 0, 0 } },
 	top = { anchor = { 0.5, 0.0 }, align = { 0.5, 0.0 }, pos = { 0, 0 } },
 	top_center_right = { anchor = { 0.5, 0.0 }, align = { 0.5, 0.0 }, pos = { 60, 20 } },
-
 	bottom = { anchor = { 0.5, 1 }, align = { 0.5, 1 }, pos = { 0, -10 } },
 	topleft = { anchor = { 0, 0 }, align = { 0, 0 }, pos = { 10, 10 } },
 	topright = { anchor = { 1, 0 }, align = { 1, 0 }, pos = { -10, 10 } },
-	-- bottomleft = { anchor = { 0, 1 }, align = { 0, 1 }, pos = { 10, -10 } },
+	-- bottomleft/bottomright offset from 1.0 to stay above the game's native bottom-edge UI
 	bottomleft = { anchor = { 0, 0.9 }, align = { 0, 0.9 }, pos = { 9 , -8 } },
-	-- bottomright = { anchor = { 1, 1 }, align = { 1, 1 }, pos = { -10, -10 } },
 	bottomright = { anchor = { 1, 0.85 }, align = { 1, 0.85 }, pos = { -9, -8 } },
-
-	-- only for testing
-	upper_left = { anchor = { 0, 0.25 }, align = { 0, 0.25 }, pos = { 10, 7.5 } },
-	topmidleft_test = { anchor = { 0.25, 0 }, align = { 0.25, 0 }, pos = { 7, 10 } },
-	midbottomleft_test = { anchor = { 0, 0.9 }, align = { 0, 0.9 }, pos = { 9 , -8 } },
-	midbottomright_test = { anchor = { 1, 0.85 }, align = { 1, 0.85 }, pos = { -9, -8 } },
 }
-
-M.KTextLib = UEHelpers.GetKismetTextLibrary()
 
 function M.FLinearColor(R, G, B, A)
 	return { R = R, G = G, B = B, A = A }
 end
 function M.FSlateColor(R, G, B, A)
 	return { SpecifiedColor = M.FLinearColor(R, G, B, A), ColorUseRule = 0 }
+end
+
+-- Pretty-print with commas: 1234567 -> "1,234,567"
+function M.Commafy(n)
+	n = math.floor(tonumber(n) or 0)
+	local s = tostring(n):reverse():gsub("(%d%d%d)", "%1,"):reverse()
+	return (s:gsub("^,", ""))
+end
+
+-- 5-tier sync color: electric-purple (nailing it) -> red (dropping)
+function M.SyncColor(frac)
+	frac = frac or 0
+	if frac >= 0.95 then return M.FSlateColor(0.69, 0.15, 1, 1)
+	elseif frac >= 0.85 then return M.FSlateColor(1, 1, 0, 1)
+	elseif frac >= 0.6 then return M.FSlateColor(0, 1, 0.5, 1)
+	elseif frac >= 0.3 then return M.FSlateColor(1, 0.6, 0, 1)
+	else return M.FSlateColor(1, 0.4, 0.4, 1) end
 end
 
 -- Compact large-number formatting (idle/incremental-game style) so values never overflow

@@ -72,7 +72,7 @@ _DiscoTracker upstream history below._
 - Accuracy and Combo monitoring.
 - HighScore persistence.
 
-[unreleased]: https://github.com/lucashort7/dad-performance-tracker/compare/v1.2.1...HEAD
-[1.2.1]: https://github.com/lucashort7/dad-performance-tracker/compare/v1.2.0...v1.2.1
-[1.2.0]: https://github.com/lucashort7/dad-performance-tracker/compare/v1.1.6...v1.2.0
-[1.1.6]: https://github.com/lucashort7/dad-performance-tracker/compare/44851ca618e13dcdcbf15e37ade571940b69e559...v1.1.6
+[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v1.2.0...v1.2.1
+[1.2.0]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v1.1.6...v1.2.0
+[1.1.6]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/44851ca618e13dcdcbf15e37ade571940b69e559...v1.1.6

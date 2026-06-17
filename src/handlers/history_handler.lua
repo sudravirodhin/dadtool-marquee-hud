@@ -8,18 +8,6 @@ local SAVE_PATH = "./ue4ss/Mods/Marquee/Scripts/data/performance_history.json"
 local TMP_PATH = SAVE_PATH .. ".tmp"
 local BAK_PATH = SAVE_PATH .. ".bak"   -- last-good copy; recovers PBs if the main file ever corrupts
 
-local function _dmp_tbl(o)
-	if type(o) == 'table' then
-		local s = '{ '
-		for k, v in pairs(o) do
-			if type(k) ~= 'number' then k = '"' .. k .. '"' end
-			s = s .. '[' .. k .. '] = ' .. _dmp_tbl(v) .. ','
-		end
-		return s .. '} '
-	else
-		return tostring(o)
-	end
-end
 
 --- centralizes and sanitizes Primary Key (PK) generation
 local function _getCleanPrimaryKey(session)
@@ -87,7 +75,7 @@ function M.SaveHistory(data)
 		log.error("Could not open temporary history file for writing.")
 		return
 	end
-	log.debug("Writing Data to TMP: " .. _dmp_tbl(data))
+	log.debug("Writing history to temp file")
 	f:write(content)
 	f:close()
 
@@ -151,7 +139,7 @@ function M.UpdateBestRun(session)
 			bestSync = 0,
 			playCount = 0,
 		}
-	log.debug("Local Personal Best: " .. _dmp_tbl(pb))
+	log.debug("Local Personal Best for: " .. tostring(pb.songName or pk))
 
 	-- Increment the play counter
 	pb.playCount = pb.playCount + 1

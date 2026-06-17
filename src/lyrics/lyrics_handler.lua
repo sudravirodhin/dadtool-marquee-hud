@@ -40,8 +40,8 @@ M._offsetReadout = 0
 
 local function getSubsys()
   if M._subsys then
-    local ok = pcall(function() return M._subsys:IsValid() end)
-    if ok and M._subsys:IsValid() then return M._subsys end
+    local ok, valid = pcall(function() return M._subsys:IsValid() end)
+    if ok and valid then return M._subsys end
   end
   local insts = FindAllOf("PagodaMusicSubsystem")
   M._subsys = (insts and insts[1]) or nil

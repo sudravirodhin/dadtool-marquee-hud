@@ -89,7 +89,7 @@ function M.EnsureUI()
 end
 
 function M.HideResultsUI()
-  results_hud.Hide()
+	results_hud.Hide()
 end
 
 --- Primary Router for State Changes. Each state owns exactly the widgets it needs
@@ -157,7 +157,7 @@ function M.Sync(sessionState)
 end
 
 function M.UpdateModStatus(sessionState)
-  -- Ensure we use the absolute latest global state
+	-- Ensure we use the absolute latest global state
 	local liveState = sessionState or _G.__SessionAggAccuracy
 
 	status_indicator_hud.SetStatus(liveState.IsTrackerVisible)

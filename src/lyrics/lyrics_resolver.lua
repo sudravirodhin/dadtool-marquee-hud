@@ -1,6 +1,6 @@
 --[[ lyrics_resolver.lua — turn live song metadata (the session `state`) into:
        * a STABLE cache key (so renames never invalidate cached lyrics)
-       * the artist / title / duration used to query LRCLIB offline
+       * the artist / title / duration for the catalog manifest and lyrics lookup
 
   Key scheme mirrors history_handler so lyrics & PB history share one identity:
     custom/imported -> tostring(SongUniqueID);  built-in -> asset short-name after last '.'
