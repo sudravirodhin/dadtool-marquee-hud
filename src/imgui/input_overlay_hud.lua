@@ -134,7 +134,7 @@ function M.Update(pc)
 	for _, b in ipairs(M.buttons) do
 		local isDown = false
 		pcall(function()
-			isDown = pc:IsInputKeyDown({ KeyName = b.key })
+			isDown = pc:IsInputKeyDown({ KeyName = FName(b.key) })
 		end)
 
 		if isDown then

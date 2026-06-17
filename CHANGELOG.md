@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.8] - 2026-06-17
+
+### Fixed
+
+- Input Overlay F5 and Key Query Crash: Fixed native ACCESS_VIOLATION crash (`0xc0000005` in `UE4SS.dll` during `push_nameproperty` Set operation) when executing the temporary `F5` input test keybind or running the input overlay. Passing a raw Lua string (e.g. `"W"`) where the Unreal Engine `FKey` struct parameter expects an `FName` caused a type casting fault inside `LuaUObject.cpp` at line 1645. Solved by wrapping all key strings in the global `FName` constructor (`FName("W")`).
+- Input Overlay Syntax Fix: Restored the missing loop header (`for _, b in ipairs(M.buttons) do`) and local variable scoping inside `input_overlay_hud.lua` that broke the sync loop syntax.
+
 ## [0.4.7] - 2026-06-17
 
 ### Added

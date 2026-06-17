@@ -279,7 +279,7 @@ RegisterKeyBind(Key.F5, function()
 			local keys = { "W", "A", "S", "D", "SpaceBar", "LeftMouseButton", "RightMouseButton", "Gamepad_FaceButton_Bottom", "Gamepad_FaceButton_Left" }
 			local status = {}
 			for _, kname in ipairs(keys) do
-				local isDown = pc:IsInputKeyDown({ KeyName = kname })
+				local isDown = pc:IsInputKeyDown({ KeyName = FName(kname) })
 				table.insert(status, string.format("%s=%s", kname, tostring(isDown)))
 			end
 			print("[Input Test] " .. table.concat(status, " | "))
