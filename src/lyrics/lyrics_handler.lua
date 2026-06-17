@@ -17,6 +17,7 @@ local lrc = require("lyrics.lrc")
 local engine = require("lyrics.lyrics_engine")
 local lyrics_hud = require("lyrics.lyrics_hud")
 local hud_handler = require("handlers.hud_handler")
+local hud_utils = require("utils.hud_utils")
 
 
 -- DEBUG: last Tick stage, written to a file so a native crash localizes precisely.
@@ -245,9 +246,9 @@ local function handleSong(elem, acc)
     pcall(function() st.SongLengthSec = song.SongLengthSec end)
     pcall(function()
       local pb = song.PerformedBy
-      if pb and is_indexable(pb) then
-        local pn = #pb
-        if type(pn) == "number" and pn >= 1 and pb[1] ~= nil then st.SongArtist = pb[1]:ToString() end
+      local first = hud_utils.GetFirstTArrayElement(pb)
+      if first ~= nil then
+        st.SongArtist = (type(first) == "userdata" and is_indexable(first) and first.ToString and first:ToString()) or tostring(first)
       end
     end)
     local info = resolver.Resolve(st)
@@ -273,7 +274,11 @@ function M.DumpCatalogManifest()
   pcall(function() arr:ForEach(function(_, e) handleSong(e, acc) end) end)
   if acc.seen == 0 then
     local n = 0; pcall(function() n = #arr end)
-    for i = 1, n do handleSong(arr[i], acc) end
+    for i = 1, n do
+      local item = nil
+      pcall(function() item = arr[i] end)
+      if item then handleSong(item, acc) end
+    end
   end
 
   if acc.seen == 0 then return nil end   -- catalog not populated with real songs yet -> caller retries

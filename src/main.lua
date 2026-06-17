@@ -6,6 +6,7 @@ local cfg = require("config")
 local history_handler = require("handlers.history_handler")
 local hud_handler = require("handlers.hud_handler")
 local combat_stats = require("combat.combat_stats")
+local hud_utils = require("utils.hud_utils")
 -- lyrics is additive: never let a lyrics bug break the tracker
 local lyrics_handler = nil
 do
@@ -88,17 +89,12 @@ local function CaptureSongMetadata()
 					pcall(function() state.SongLengthSec = subsys:GetSongLengthSeconds() end)
 					pcall(function() state.SongIsImported = currentSong.bImportedSong end)
 					pcall(function()
-						-- NEVER index a TArray without a length check: pb[1] on an empty
-						-- PerformedBy (custom songs) is an out-of-bounds native crash.
+						-- NEVER index a TArray directly: use GetFirstTArrayElement to safely retrieve
+						-- and unwrap the element, avoiding out-of-bounds native crashes.
 						local pb = currentSong.PerformedBy
-						if pb and is_indexable(pb) then
-							local n = #pb
-							if type(n) == "number" and n >= 1 then
-								local first = pb[1]
-								if first ~= nil then
-									state.SongArtist = (type(first) == "userdata" and is_indexable(first) and first.ToString and first:ToString()) or tostring(first)
-								end
-							end
+						local first = hud_utils.GetFirstTArrayElement(pb)
+						if first ~= nil then
+							state.SongArtist = (type(first) == "userdata" and is_indexable(first) and first.ToString and first:ToString()) or tostring(first)
 						end
 					end)
 					log.info(string_format("CURRENT SONG changed: %s | %s | %s",

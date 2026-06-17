@@ -61,4 +61,36 @@ function M.Abbrev(n)
 	return sign .. string.format("%.2e", n)   -- absurdly large -> scientific
 end
 
+function M.is_indexable(obj)
+	if not obj then return false end
+	local t = type(obj)
+	if t == "table" then return true end
+	if t == "userdata" then
+		return getmetatable(obj) ~= nil
+	end
+	return false
+end
+
+-- Safely retrieves and unwraps the first element of a TArray without direct indexing,
+-- preventing native out-of-bounds crashes in UE4SS.
+function M.GetFirstTArrayElement(arr)
+	if not arr or not M.is_indexable(arr) then return nil end
+	local first = nil
+	pcall(function()
+		arr:ForEach(function(_, elem)
+			if first == nil then
+				first = elem
+			end
+		end)
+	end)
+	if first ~= nil then
+		pcall(function()
+			if M.is_indexable(first) and first.get then
+				first = first:get()
+			end
+		end)
+	end
+	return first
+end
+
 return M
