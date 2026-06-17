@@ -222,18 +222,16 @@ LoopAsync(cfg.LYRICS_TICK_MS or 60, function()
 	return false
 end)
 
--- input overlay sync loop (high-frequency 30ms polling, runs only if enabled and playing)
+-- input overlay update hook (runs strictly on the game thread to avoid multithreading race conditions)
 local input_overlay_hud = require("imgui.input_overlay_hud")
-LoopAsync(30, function()
-	if cfg.INPUT_OVERLAY_ENABLED then
-		ExecuteInGameThread(function()
-			local pc = UEHelpers.GetPlayerController()
-			if pc and pc:IsValid() then
-				pcall(input_overlay_hud.Update, pc)
-			end
-		end)
-	end
-	return false
+RegisterHook("/Script/Engine.PlayerController:PlayerTick", function(wrappedSelf)
+	if not cfg.INPUT_OVERLAY_ENABLED then return end
+	pcall(function()
+		local self = wrappedSelf:get()
+		if self and self:IsValid() then
+			input_overlay_hud.Update(self)
+		end
+	end)
 end)
 
 -- Once the song catalog is loaded, dump the FULL manifest (_catalog.jsonl: every in-game +
