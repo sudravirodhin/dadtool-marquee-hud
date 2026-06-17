@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-06-17
+
+### Fixed
+- Built-in Song Crash: Fixed native game crash (`0xc0000005` in `UE4SS.dll` during table lookup) on built-in songs (like "Remedy") by upgrading `is_indexable` to verify userdata validity via `IsValid()`. This prevents crashes when indexing non-existent metadata properties (like `StarThresholds` which only exist on imported songs).
+- HUD Sync Loop Error: Resolved a repeating `attempt to call a nil value (global 'GetMusicSubsystem')` error by placing the definition of `GetMusicSubsystem` above its usage in the file.
+
 ## [0.4.0] - 2026-06-17
 
 ### Added
