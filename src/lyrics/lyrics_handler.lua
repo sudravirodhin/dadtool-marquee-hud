@@ -107,16 +107,9 @@ function M.OnSongStart(state)
     lyrics_hud.Hide()
   end
 
-  -- No cached LRC. Imported songs are pre-produced by dadtool at import time, so only
-  -- BUILT-IN game songs reach here — note them in the queue for the importer to satisfy
-  -- (dadtool `dad lyrics --queue` reads _requests.jsonl). Marquee never fetches/produces.
-  if store.HasMiss(info.key) then
-    log.debug("[lyrics] no synced lyrics available for key=" .. info.key)
-  else
-    store.QueueRequest(info)
-    log.info(string.format("[lyrics] no cache for '%s' — queued for the importer (dadtool)",
-      tostring(info.title)))
-  end
+  -- No cached LRC. dadtool works off the boot catalog manifest (_catalog.jsonl), which already
+  -- lists every song — so we no longer queue individual songs here; just note it for the log.
+  log.debug("[lyrics] no synced lyrics for key=" .. info.key)
 end
 
 function M.OnSongEnd()
@@ -199,12 +192,11 @@ function M.ResetOffset()
   log.info("[lyrics] offset reset for " .. tostring(M._songKey))
 end
 
--- One-time catalog sweep: queue a lyrics request for every catalog song that has no
--- <key>.lrc/.miss yet, so dadtool (`dad lyrics --queue`) can fetch them all without the
--- player visiting each song. Returns the count seen (>=0), or nil if the catalog isn't
--- loaded yet (caller retries). QueueRequest de-dups per session; the main.lua trigger gates
--- this to run ONCE, so it never re-appends per frame.
--- Process one catalog entry (which may be a wrapped TArray element) into a queue request.
+-- Dump the FULL catalog manifest (_catalog.jsonl: every in-game + imported song's current key
+-- + title/artist) so dadtool always has the complete song list to generate lyrics from. No
+-- per-song queue. Returns the count seen (>=0), or nil if the catalog isn't loaded yet (caller
+-- retries). The main.lua trigger runs this once per game load.
+-- Process one catalog entry (which may be a wrapped TArray element) into the manifest.
 local function handleSong(elem, acc)
   pcall(function()
     local song = elem
@@ -223,14 +215,13 @@ local function handleSong(elem, acc)
       if type(pn) == "number" and pn >= 1 and pb[1] ~= nil then st.SongArtist = pb[1]:ToString() end
     end)
     local info = resolver.Resolve(st)
-    if info and info.key and not store.HasLrc(info.key) and not store.HasMiss(info.key) then
-      store.QueueRequest(info)
-      acc.queued = acc.queued + 1
+    if info and info.key then
+      acc.manifest[#acc.manifest + 1] = info   -- record EVERY song into the manifest (no per-song queue)
     end
   end)
 end
 
-function M.QueueAllFromCatalog()
+function M.DumpCatalogManifest()
   if not M.enabled then return 0 end
   local cats = FindAllOf("PagodaSongCatalogSubsystem")
   if not cats or #cats == 0 then return nil end
@@ -240,7 +231,7 @@ function M.QueueAllFromCatalog()
   if not arr then pcall(function() arr = sub.SongAssets end) end   -- fall back to backing array
   if not arr then return nil end
 
-  local acc = { seen = 0, queued = 0 }
+  local acc = { seen = 0, manifest = {} }
   -- object-pointer TArrays iterate cleanest via ForEach; fall back to numeric indexing
   pcall(function() arr:ForEach(function(_, e) handleSong(e, acc) end) end)
   if acc.seen == 0 then
@@ -249,7 +240,8 @@ function M.QueueAllFromCatalog()
   end
 
   if acc.seen == 0 then return nil end   -- catalog not populated with real songs yet -> caller retries
-  log.info(string.format("[lyrics] catalog sweep: %d songs seen, %d new queued for dadtool", acc.seen, acc.queued))
+  pcall(function() store.WriteCatalog(acc.manifest) end)   -- full current-catalog snapshot for dadtool
+  log.info(string.format("[lyrics] catalog manifest: %d songs dumped for dadtool", #acc.manifest))
   return acc.seen
 end
 

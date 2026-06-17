@@ -4,6 +4,7 @@
 *.words.json
 *.offset
 _requests.jsonl
+_catalog.jsonl
 **/data/*.json
 performance_history.json
 profile.json

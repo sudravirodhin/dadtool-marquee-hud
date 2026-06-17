@@ -14,6 +14,7 @@ local M = {}
 
 local DIR = "./ue4ss/Mods/Marquee/Scripts/data/lyrics/"
 local REQUESTS = DIR .. "_requests.jsonl"
+local CATALOG  = DIR .. "_catalog.jsonl"
 
 local function readFile(path)
   local f = io.open(path, "r")
@@ -85,6 +86,30 @@ function M.QueueRequest(info)
   f:close()
   log.debug(string.format("[lyrics] queued fetch: %s - %s (%ss)",
     tostring(info.artist), tostring(info.title), tostring(info.durationSec)))
+end
+
+-- Snapshot EVERY catalog song's current key + metadata in ONE bulk write per sweep, so
+-- dadtool's re-map can match current keys to orphaned <oldkey>.lrc after a game update
+-- re-versions songs. Overwrites each sweep (a full snapshot, never a per-session append).
+function M.WriteCatalog(entries)
+  if type(entries) ~= "table" then return end
+  local out = {}
+  for _, info in ipairs(entries) do
+    if info and info.key and info.key ~= "" then
+      local ok, line = pcall(json.encode, {
+        key = info.key, artist = info.artist or "", title = info.title or "",
+        durationSec = info.durationSec or 0, isImported = info.isImported and true or false,
+        songName = info.songName or "",
+      })
+      if ok then out[#out + 1] = line end
+    end
+  end
+  local f = io.open(CATALOG, "w")
+  if not f then log.debug("[lyrics] cannot write catalog manifest: " .. CATALOG); return end
+  f:write(table.concat(out, "\n"))
+  if #out > 0 then f:write("\n") end
+  f:close()
+  log.debug(string.format("[lyrics] wrote catalog manifest: %d songs", #out))
 end
 
 return M

@@ -191,23 +191,23 @@ LoopAsync(cfg.LYRICS_TICK_MS or 60, function()
 	return false
 end)
 
--- One-time catalog lyrics sweep: once the song catalog is loaded, queue every song lacking
--- lyrics so dadtool (`dad lyrics --queue`) can fetch them all -- no need to play each one.
--- Gated to run ONCE (flag); QueueRequest also de-dups, so nothing re-appends per frame.
-if cfg.LYRICS_QUEUE_ALL ~= false then
-	local sweeps = 0
+-- Once the song catalog is loaded, dump the FULL manifest (_catalog.jsonl: every in-game +
+-- imported song's current key + meta) so dadtool always has the complete song list to generate
+-- lyrics from. Runs once per game load (when the catalog is ready); no per-song queuing.
+if cfg.LYRICS_DUMP_CATALOG ~= false then
+	local tries = 0
 	LoopAsync(8000, function()
 		local state = _G.__SessionAggAccuracy
-		if state.__queuedAllSongs then return true end
-		sweeps = sweeps + 1
-		local capped = sweeps >= 15            -- catalog never showed (~2 min) -> stop trying
+		if state.__dumpedCatalog then return true end
+		tries = tries + 1
+		local capped = tries >= 15            -- catalog never showed (~2 min) -> stop trying
 		ExecuteInGameThread(function()
-			if state.__queuedAllSongs then return end
+			if state.__dumpedCatalog then return end
 			local n = nil
-			pcall(function() if lyrics_handler then n = lyrics_handler.QueueAllFromCatalog() end end)
-			if type(n) == "number" or capped then state.__queuedAllSongs = true end
+			pcall(function() if lyrics_handler then n = lyrics_handler.DumpCatalogManifest() end end)
+			if type(n) == "number" or capped then state.__dumpedCatalog = true end
 		end)
-		return state.__queuedAllSongs
+		return state.__dumpedCatalog
 	end)
 end
 

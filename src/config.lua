@@ -40,7 +40,7 @@ cfg.LYRICS_NOTICE_FADE_TICKS = 18  -- ticks spent fading out (~1.1s)
 cfg.LYRICS_NUDGE_STEP = 0.1        -- seconds per F9/F10 lyric-offset nudge
 cfg.LYRICS_READY_MIN_WAIT = 4      -- show "lyrics ready" only if the first line is >N sec away
 cfg.LYRICS_DEBUG = false           -- true = write per-tick stage to _tick_stage.txt (crash localization)
-cfg.LYRICS_QUEUE_ALL = true        -- one-time at boot: queue every catalog song lacking lyrics for dadtool
+cfg.LYRICS_DUMP_CATALOG = true     -- at boot: dump the full song-catalog manifest (_catalog.jsonl) for dadtool
 
 --[[
     ============ ~results cfg ============

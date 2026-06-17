@@ -56,7 +56,7 @@ Marquee is **display-only** for lyrics: it reads cached `.lrc` files but never f
 | `HUD_MAIN_ALLIGNMENT` | `"topright"` | Anchor for the live PB / Sync panel. |
 | `HUD_UPDATE_INTERVAL_MS` | `400` | Live-HUD refresh rate (ms). |
 | `LYRICS_ENABLED` | `true` | Master lyrics on/off (also toggled with F2). |
-| `LYRICS_QUEUE_ALL` | `true` | One-time at boot: queue every catalog song lacking lyrics for the importer. |
+| `LYRICS_DUMP_CATALOG` | `true` | At boot: dump the full song-catalog manifest (`_catalog.jsonl`) for the importer (dadtool). |
 | `LEVELING_ENABLED` | `true` | Track XP and levels. |
 
 ## Credits & License
