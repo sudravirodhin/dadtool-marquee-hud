@@ -39,7 +39,7 @@ This includes the Marquee mod and our custom-compiled, stable UE4SS loader binar
 
 ### Option B: Mod-Only Standalone
 This contains only the `Marquee` mod folder itself, meant to be swapped into an existing UE4SS installation.
-1. Download the mod-only bundle (`Marquee-vX.Y.Z-mod-only.zip`).
+1. Download the mod-only bundle (`Marquee-STANDALONE-vX.Y.Z.zip`).
 2. Unzip and place the `Marquee` folder inside your existing `ue4ss/Mods/` directory.
 3. Make sure the mod is enabled by having the `enabled.txt` file in `ue4ss/Mods/Marquee/` (which is included in the zip).
 4. Launch the game.
@@ -49,7 +49,7 @@ This contains only the `Marquee` mod folder itself, meant to be swapped into an 
 
 ### Option C: Custom UE4SS Binaries Only (Standalone)
 Looking just for our custom UE4SS? Here it is!
-1. Download the standalone custom UE4SS package (`UE4SS-vX.Y.Z-custom.zip`) from the releases page.
+1. Download the standalone custom UE4SS package (`UE4SS-custom-vX.Y.Z.zip`) from the releases page.
 2. Unzip its contents directly into `Dead as Disco/Pagoda/Binaries/Win64/` (so that `dwmapi.dll` and the `ue4ss/` folder structure sit next to `Pagoda-Win64-Shipping.exe`).
 3. Proceed with running any other UE4SS Lua mods without the Marquee mod.
 
@@ -63,7 +63,6 @@ Marquee is **display-only** for lyrics: it reads cached `.lrc` files but never f
 |---|---|
 | **F2** | Toggle lyrics |
 | **F3** | Toggle the tracker HUD |
-| **F4 / F5** | Force HUD on / off |
 | **F6** | Career Stats panel |
 | **F9 / F10** | Nudge the current song's lyric timing earlier / later (saved per song) |
 | **F11** | Reset the current song's lyric offset |
@@ -72,7 +71,7 @@ Marquee is **display-only** for lyrics: it reads cached `.lrc` files but never f
 
 | Variable | Default | Description |
 |---|---|---|
-| `HUD_MAIN_ALLIGNMENT` | `"topright"` | Anchor for the live PB / Sync panel. |
+| `HUD_MAIN_ALLIGNMENT` | `"bottomleft"` | Anchor for the live PB / Sync panel. |
 | `HUD_UPDATE_INTERVAL_MS` | `400` | Live-HUD refresh rate (ms). |
 | `LYRICS_ENABLED` | `true` | Master lyrics on/off (also toggled with F2). |
 | `LYRICS_DUMP_CATALOG` | `true` | At boot: dump the full song-catalog manifest (`_catalog.jsonl`) for the importer (dadtool). |
