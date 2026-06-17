@@ -9,8 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.4.7] - 2026-06-17
 
-## [0.4.7] - 2026-06-17
-
 ### Added
 
 - Live Input Overlay: Introduced an on-screen visual input overlay (`imgui/input_overlay_hud.lua`) that displays keyboard (`W`/`A`/`S`/`D` + `Space` + Mouse clicks) and controller action button presses in real time. Features a separate, lightweight high-frequency sync loop (30ms / ~33fps) that queries the player controller's key states. Completely toggleable via configuration (`cfg.INPUT_OVERLAY_ENABLED = false`), which completely disables all loops and widgets when off.
