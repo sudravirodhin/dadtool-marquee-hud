@@ -124,15 +124,31 @@ function M.Accumulate(state, snap)
   if type(snap.score) == "number" then state.TotalScore = snap.score end
   if type(snap.mult)  == "number" then state.Multiplier = snap.mult end
 
-  -- Capture the per-move breakdown DURING play: the game clears CombatActionScores at song
-  -- end, so a read on the results hook is usually empty. Keep the latest non-empty read
-  -- (throttled to ~every 3rd tick); CaptureFinal prefers it over an empty end-of-song read.
-  if cfg.POLL_MOVE_SCORES_IN_GAME then
+  -- Capture the per-move breakdown: either throughout play if configured (throttled),
+  -- or safely during the song's ending window (last 3 seconds) when combat has ceased (unthrottled).
+  local shouldPollThrottled = cfg.POLL_MOVE_SCORES_IN_GAME
+  local shouldPollUnthrottled = false
+
+  if not shouldPollThrottled then
+    local subsys = GetMusicSubsystem()
+    if subsys then
+      local pos = safe(function() return subsys:GetTimelinePosition() end)
+      local len = state.SongLengthSec or safe(function() return subsys:GetSongLengthSeconds() end)
+      if type(pos) == "number" and type(len) == "number" and len > 3 then
+        shouldPollUnthrottled = (pos >= len - 3.0)
+      end
+    end
+  end
+
+  if shouldPollThrottled then
     state.__moveTick = (state.__moveTick or 0) + 1
     if state.__moveTick % 3 == 0 then
       local m = M.ReadMoveScores()
       if #m > 0 then state.MoveScores = m end
     end
+  elseif shouldPollUnthrottled then
+    local m = M.ReadMoveScores()
+    if #m > 0 then state.MoveScores = m end
   end
 
   -- 1. Star Rating Projection
