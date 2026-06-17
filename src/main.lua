@@ -49,11 +49,21 @@ _G.__SessionAggAccuracy = _G.__SessionAggAccuracy or {
 	__xpAwarded = false,
 }
 
+local function is_indexable(obj)
+	if not obj then return false end
+	local t = type(obj)
+	if t == "table" then return true end
+	if t == "userdata" then
+		return getmetatable(obj) ~= nil
+	end
+	return false
+end
+
 --[[ ============ SONG IDENTITY (for lyrics + history key) ============ --]]
 local _musicSubsys = nil
 local function GetMusicSubsystem()
 	if _musicSubsys then
-		local ok, valid = pcall(function() return _musicSubsys:IsValid() end)
+		local ok, valid = pcall(function() return is_indexable(_musicSubsys) and _musicSubsys:IsValid() end)
 		if ok and valid then return _musicSubsys end
 	end
 	local insts = FindAllOf("PagodaMusicSubsystem")
@@ -65,9 +75,9 @@ local function CaptureSongMetadata()
 	local state = _G.__SessionAggAccuracy
 	pcall(function()
 		local subsys = GetMusicSubsystem()
-		if subsys then
+		if subsys and is_indexable(subsys) then
 			local currentSong = subsys:GetCurrentSong()
-			if currentSong and currentSong:IsValid() then
+			if currentSong and is_indexable(currentSong) and currentSong:IsValid() then
 				local newUID = currentSong:GetImportedSongUniqueID()
 				local newName = currentSong.SongName:ToString()
 				-- Only update and log if the song unique ID or name has changed
@@ -81,11 +91,13 @@ local function CaptureSongMetadata()
 						-- NEVER index a TArray without a length check: pb[1] on an empty
 						-- PerformedBy (custom songs) is an out-of-bounds native crash.
 						local pb = currentSong.PerformedBy
-						local n = (pb and #pb) or 0
-						if type(n) == "number" and n >= 1 then
-							local first = pb[1]
-							if first ~= nil then
-								state.SongArtist = (type(first) == "userdata" and first.ToString and first:ToString()) or tostring(first)
+						if pb and is_indexable(pb) then
+							local n = #pb
+							if type(n) == "number" and n >= 1 then
+								local first = pb[1]
+								if first ~= nil then
+									state.SongArtist = (type(first) == "userdata" and is_indexable(first) and first.ToString and first:ToString()) or tostring(first)
+								end
 							end
 						end
 					end)

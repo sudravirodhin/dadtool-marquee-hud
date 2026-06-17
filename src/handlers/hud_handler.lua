@@ -29,11 +29,21 @@ M.CurrentState = M.States.PRE_GAME
 local HUB_NAMES = cfg.HUB_MAP_NAMES or { "encore" }
 local _lastMapId = nil
 
+local function is_indexable(obj)
+	if not obj then return false end
+	local t = type(obj)
+	if t == "table" then return true end
+	if t == "userdata" then
+		return getmetatable(obj) ~= nil
+	end
+	return false
+end
+
 local function getMapId()
 	local id
 	pcall(function()
 		local world = UEHelpers.GetWorld()
-		if world and world:IsValid() then id = world:GetFullName() end
+		if world and is_indexable(world) and world:IsValid() then id = world:GetFullName() end
 	end)
 	return id
 end
@@ -70,7 +80,7 @@ local function isSongPaused()
 	local ok, paused = pcall(function()
 		local insts = FindAllOf("PagodaMusicSubsystem")
 		local s = insts and insts[1]
-		return s and s:IsSongPaused() == true
+		return s and is_indexable(s) and s:IsSongPaused() == true
 	end)
 	return ok and paused == true
 end

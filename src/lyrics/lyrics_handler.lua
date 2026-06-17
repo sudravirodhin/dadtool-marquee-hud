@@ -40,9 +40,19 @@ M._songKey = nil
 M._songOffset = 0   -- per-song lyric offset (sec): + = lyrics earlier
 M._offsetReadout = 0
 
+local function is_indexable(obj)
+  if not obj then return false end
+  local t = type(obj)
+  if t == "table" then return true end
+  if t == "userdata" then
+    return getmetatable(obj) ~= nil
+  end
+  return false
+end
+
 local function getSubsys()
   if M._subsys then
-    local ok, valid = pcall(function() return M._subsys:IsValid() end)
+    local ok, valid = pcall(function() return is_indexable(M._subsys) and M._subsys:IsValid() end)
     if ok and valid then return M._subsys end
   end
   local insts = FindAllOf("PagodaMusicSubsystem")
@@ -224,8 +234,8 @@ end
 local function handleSong(elem, acc)
   pcall(function()
     local song = elem
-    pcall(function() if song and song.get then song = song:get() end end)   -- unwrap wrapped element
-    if not song or not song:IsValid() then return end
+    pcall(function() if song and is_indexable(song) and song.get then song = song:get() end end)   -- unwrap wrapped element
+    if not song or not is_indexable(song) or not song:IsValid() then return end
     local full = song:GetFullName()
     if not full or full:find("Default__") then return end   -- skip the class-default object
     acc.seen = acc.seen + 1
@@ -235,8 +245,10 @@ local function handleSong(elem, acc)
     pcall(function() st.SongLengthSec = song.SongLengthSec end)
     pcall(function()
       local pb = song.PerformedBy
-      local pn = (pb and #pb) or 0
-      if type(pn) == "number" and pn >= 1 and pb[1] ~= nil then st.SongArtist = pb[1]:ToString() end
+      if pb and is_indexable(pb) then
+        local pn = #pb
+        if type(pn) == "number" and pn >= 1 and pb[1] ~= nil then st.SongArtist = pb[1]:ToString() end
+      end
     end)
     local info = resolver.Resolve(st)
     if info and info.key then
@@ -250,10 +262,11 @@ function M.DumpCatalogManifest()
   local cats = FindAllOf("PagodaSongCatalogSubsystem")
   if not cats or #cats == 0 then return nil end
   local sub = cats[1]
+  if not sub or not is_indexable(sub) then return nil end
   local arr = nil
   pcall(function() arr = sub:GetAllSongs() end)       -- official BlueprintPure getter
   if not arr then pcall(function() arr = sub.SongAssets end) end   -- fall back to backing array
-  if not arr then return nil end
+  if not arr or not is_indexable(arr) then return nil end
 
   local acc = { seen = 0, manifest = {} }
   -- object-pointer TArrays iterate cleanest via ForEach; fall back to numeric indexing
