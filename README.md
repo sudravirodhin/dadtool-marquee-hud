@@ -25,18 +25,27 @@ DiscoTracker tracked invented hit-accuracy ("Perfect" rates, letter ranks) by ho
 
 ## Install
 
-Marquee runs on **UE4SS** (the Unreal Engine scripting system) — it is **not** bundled here. For *Dead as Disco*, use the game-matched build from Nexus, which is the version Marquee is developed and tested against:
+Marquee requires **UE4SS** (the Unreal Engine scripting system). We provide two release options on our **[GitHub Releases page](https://github.com/sudravirodhin/dadtool-marquee-hud/releases)**:
 
-➡️ **[UE4SS for Dead as Disco — Nexus Mods #872](https://www.nexusmods.com/deadasdisco/mods/872?tab=files)**  ·  built on the [UE4SS project](https://github.com/UE4SS-RE/RE-UE4SS)
+### Option A: Full Bundle (Recommended)
+This includes the Marquee mod and our custom-compiled, stable UE4SS loader binaries configured for *Dead as Disco* build `CL-29008`.
+1. Download the full bundle (`Marquee-vX.Y.Z.zip`) from the releases page.
+2. Unzip its contents directly into `Dead as Disco/Pagoda/Binaries/Win64/` (so that `dwmapi.dll` and the `ue4ss/` directory sit next to `Pagoda-Win64-Shipping.exe`).
+3. Launch the game.
 
-1. Install that UE4SS into `Dead as Disco/Pagoda/Binaries/Win64` — its `dwmapi.dll` and `ue4ss/` folder go directly in `Win64`.
-2. Copy this repo's `src/` into `…/Win64/ue4ss/Mods/Marquee/Scripts/` (so `…/Marquee/Scripts/main.lua` exists).
-3. Add `Marquee : 1` to `…/ue4ss/Mods/mods.txt`.
+### Option B: Mod-Only Standalone
+This contains only the `Marquee` mod folder itself, meant to be swapped into an existing UE4SS installation.
+1. Download the mod-only bundle (`Marquee-vX.Y.Z-mod-only.zip`).
+2. Unzip and place the `Marquee` folder inside your existing `ue4ss/Mods/` directory.
+3. Make sure the mod is enabled by having the `enabled.txt` file in `ue4ss/Mods/Marquee/` (which is included in the zip).
 4. Launch the game.
+
+> [!WARNING]
+> **No guarantee on stability is provided for the mod-only package** if used with standard or upstream UE4SS versions. Upstream loader versions are prone to native crashes (e.g. use-after-free hook faults on game build `CL-29008`). Our full bundle is custom-built and optimized to bypass these crashes.
 
 ### Lyrics (optional, and BYO)
 
-Marquee is **display-only** for lyrics: it reads cached `.lrc` files but never fetches, generates, or bundles them — **no song lyrics ship in this repo** (copyright). To produce synced lyrics, use the companion importer **dadtool** (separate project), which drains Marquee's request queue and writes `<key>.lrc` files into `…/Marquee/Scripts/data/lyrics/`. The on-disk contract is documented in [`docs/IMPORTER_LRC_SPEC.md`](docs/IMPORTER_LRC_SPEC.md).
+Marquee is **display-only** for lyrics: it reads cached `.lrc` files but never fetches, generates, or bundles them — **no song lyrics ship in this repo** (copyright). To produce synced lyrics, use the companion importer **[dadtool](https://github.com/sudravirodhin/dadtool-importer)**, which drains Marquee's request queue and writes `<key>.lrc` files into `…/Marquee/Scripts/data/lyrics/`. The on-disk contract is documented in [`docs/IMPORTER_LRC_SPEC.md`](docs/IMPORTER_LRC_SPEC.md).
 
 ## Keybinds
 
