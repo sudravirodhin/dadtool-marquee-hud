@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.4] - 2026-06-17
+
+### Fixed
+- Mid-combat Counter Crash: Fixed native game crash (`0xc0000005` in `UE4SS.dll` during `luaH_getint` lookup) occurring mid-combat when countering. This was caused by iterating over the game's `CombatActionScores` `TMap` using `ForEach` in the background loop while the game thread concurrently mutated the map's C++ memory layout. Introduced a configuration toggle `cfg.POLL_MOVE_SCORES_IN_GAME` defaulting to `false` to disable mid-combat move polling, and registered a hook on `WBP_LevelEndScreen:Construct` to safely capture final scores exactly once when combat has ceased but before the score component is cleared. Added `state.__capturedFinal` flag and value guards to prevent redundant calculations and nil overwrites.
+
 ## [0.4.3] - 2026-06-17
 
 ### Added

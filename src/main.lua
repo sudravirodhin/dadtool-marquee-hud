@@ -48,6 +48,7 @@ _G.__SessionAggAccuracy = _G.__SessionAggAccuracy or {
 	__hb_hooks = false,
 	__reg_hooks = { Lifecycle = false, Scores = false },
 	__xpAwarded = false,
+	__capturedFinal = false,
 }
 
 local function is_indexable(obj)
@@ -162,6 +163,10 @@ local function RegisterLifecycleHooks()
 end
 
 local function RegisterScoresHooks()
+	RegisterHook(GAME_PATHS.LevelEnd .. ":Construct", function()
+		pcall(OnResults)
+		log.debug("Level end screen constructed — captured final stats")
+	end)
 	RegisterHook(GAME_PATHS.HighScores .. ":Construct", function()
 		pcall(OnResults)
 		log.debug("Results screen detected — captured final stats")

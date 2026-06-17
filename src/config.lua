@@ -1,7 +1,7 @@
 local cfg = {}
 
 -- ~version (bump MARQUEE_VERSION on releases; UE4SS_VERSION updated when the loader is swapped)
-cfg.MARQUEE_VERSION = "0.4.3"
+cfg.MARQUEE_VERSION = "0.4.4"
 cfg.UE4SS_VERSION = "4.0.0-rc1"
 
 -- ~log
@@ -48,6 +48,8 @@ cfg.LYRICS_DUMP_CATALOG = true     -- at boot: dump the full song-catalog manife
 cfg.RESULTS_ALIGNMENT = "center"   -- Performance Report placement (keeps it off the native results UI)
 cfg.RESULTS_POS_X = 0
 cfg.RESULTS_POS_Y = 90             -- + = lower in frame (nudged down to clear the native "RESULT" banner)
+cfg.POLL_MOVE_SCORES_IN_GAME = false -- if true, poll move scores mid-combat (can crash if game mutates map concurrently). If false, captured once at song end.
+
 
 --[[
     ============ ~leveling cfg ============

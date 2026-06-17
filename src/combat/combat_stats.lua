@@ -11,6 +11,7 @@ local M = {}
 
 local UEHelpers = require("UEHelpers")
 local log = require("utils.log")
+local cfg = require("config")
 
 local function is_valid(o)
   if not o then return false end
@@ -126,10 +127,12 @@ function M.Accumulate(state, snap)
   -- Capture the per-move breakdown DURING play: the game clears CombatActionScores at song
   -- end, so a read on the results hook is usually empty. Keep the latest non-empty read
   -- (throttled to ~every 3rd tick); CaptureFinal prefers it over an empty end-of-song read.
-  state.__moveTick = (state.__moveTick or 0) + 1
-  if state.__moveTick % 3 == 0 then
-    local m = M.ReadMoveScores()
-    if #m > 0 then state.MoveScores = m end
+  if cfg.POLL_MOVE_SCORES_IN_GAME then
+    state.__moveTick = (state.__moveTick or 0) + 1
+    if state.__moveTick % 3 == 0 then
+      local m = M.ReadMoveScores()
+      if #m > 0 then state.MoveScores = m end
+    end
   end
 
   -- 1. Star Rating Projection
@@ -281,6 +284,9 @@ end
 -- Snapshot everything into state at song end (for the results screen + XP).
 function M.CaptureFinal(state)
   if not state then return end
+  if state.__capturedFinal then return end
+  state.__capturedFinal = true
+
   local snap = M.Poll()
   M.Accumulate(state, snap)
   -- max combo straight from the score component (we no longer poll combo each tick)
@@ -290,9 +296,12 @@ function M.CaptureFinal(state)
   if #fm > 0 then state.MoveScores = fm end   -- fresh read if available, else keep the in-play capture
   state.FinalAvgSync = M.AvgSync(state)
   state.FinalPeakSync = state.SyncPeak
-  state.StarsAtEnd = M.ReadStars()
-  if type(state.StarsAtEnd) == "number" and type(state.StarsStart) == "number" then
-    state.StarsEarned = math.max(0, state.StarsAtEnd - state.StarsStart)  -- stars earned THIS song
+  local stars = M.ReadStars()
+  if stars ~= nil then
+    state.StarsAtEnd = stars
+    if type(state.StarsStart) == "number" then
+      state.StarsEarned = math.max(0, state.StarsAtEnd - state.StarsStart)  -- stars earned THIS song
+    end
   end
   log.debug(string.format("[combat] final: score=%s maxCombo=%s avgSync=%s peakSync=%s moves=%d",
     tostring(state.TotalScore), tostring(state.MaxCombo),
@@ -362,6 +371,7 @@ end
 -- Reset the per-song accumulators (call at song start).
 function M.Reset(state)
   if not state then return end
+  state.__capturedFinal = false
   state.SyncSamples, state.SyncSum, state.SyncPeak = 0, 0, 0
   state.SyncStreak, state.SyncStreakMax = 0, 0
   state.Combo, state.MaxCombo, state.Multiplier = 0, 0, 1
