@@ -1,7 +1,7 @@
 local cfg = {}
 
 -- ~version (bump MARQUEE_VERSION on releases; UE4SS_VERSION updated when the loader is swapped)
-cfg.MARQUEE_VERSION = "0.4.6"
+cfg.MARQUEE_VERSION = "0.4.7"
 cfg.UE4SS_VERSION = "4.0.0-rc1"
 
 -- ~log
@@ -60,5 +60,13 @@ cfg.LEVELING_ENABLED = true        -- track XP + levels and show them on the res
 -- cfg.XP_FULLCOMBO_BONUS_PCT = 10    -- +% XP when full combo
 -- cfg.LEVEL_TITLES = { ... }      -- optional override of the 20 level titles
 -- cfg.LEVEL_THRESHOLDS = { ... }  -- optional override of the cumulative XP curve
+
+--[[
+    ============ ~input overlay cfg ============
+--]]
+cfg.INPUT_OVERLAY_ENABLED = false       -- master toggle to show controller/keyboard button presses on-screen
+cfg.INPUT_OVERLAY_ALIGNMENT = "bottomleft"
+cfg.INPUT_OVERLAY_POS_X = 15
+cfg.INPUT_OVERLAY_POS_Y = -120          -- stacked neatly above the live progress HUD (at -15)
 
 return cfg

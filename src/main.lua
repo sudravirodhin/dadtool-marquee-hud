@@ -222,6 +222,22 @@ LoopAsync(cfg.LYRICS_TICK_MS or 60, function()
 	return false
 end)
 
+-- input overlay sync loop (high-frequency 30ms polling, runs only if enabled and playing)
+if cfg.INPUT_OVERLAY_ENABLED then
+	local input_overlay_hud = require("imgui.input_overlay_hud")
+	LoopAsync(30, function()
+		if hud_handler.CurrentState == hud_handler.States.IN_GAME then
+			ExecuteInGameThread(function()
+				local pc = UEHelpers.GetPlayerController()
+				if pc and pc:IsValid() then
+					pcall(input_overlay_hud.Update, pc)
+				end
+			end)
+		end
+		return false
+	end)
+end
+
 -- Once the song catalog is loaded, dump the FULL manifest (_catalog.jsonl: every in-game +
 -- imported song's current key + meta) so dadtool always has the complete song list to generate
 -- lyrics from. Runs once per game load (when the catalog is ready); no per-song queuing.
@@ -254,13 +270,23 @@ RegisterKeyBind(Key.F3, function()
 	s.IsTrackerVisible = not s.IsTrackerVisible
 	hud_handler.UpdateModStatus(s)
 end)
-RegisterKeyBind(Key.F4, function()
-	_G.__SessionAggAccuracy.IsTrackerVisible = true
-	hud_handler.UpdateModStatus(_G.__SessionAggAccuracy)
-end)
+
+-- Temporary input state query test
 RegisterKeyBind(Key.F5, function()
-	_G.__SessionAggAccuracy.IsTrackerVisible = false
-	hud_handler.UpdateModStatus(_G.__SessionAggAccuracy)
+	pcall(function()
+		local pc = UEHelpers.GetPlayerController()
+		if pc and pc:IsValid() then
+			local keys = { "W", "A", "S", "D", "SpaceBar", "LeftMouseButton", "RightMouseButton", "Gamepad_FaceButton_Bottom", "Gamepad_FaceButton_Left" }
+			local status = {}
+			for _, kname in ipairs(keys) do
+				local isDown = pc:IsInputKeyDown({ KeyName = kname })
+				table.insert(status, string.format("%s=%s", kname, tostring(isDown)))
+			end
+			print("[Input Test] " .. table.concat(status, " | "))
+		else
+			print("[Input Test] Player Controller is not valid")
+		end
+	end)
 end)
 
 -- ============ F6: Career Stats panel (toggle) ============
