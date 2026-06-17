@@ -103,6 +103,8 @@ function M.CreateTextBlock(parent, name, params)
 
 		if parent.AddChild then
 			parent:AddChild(tb)
+		elseif parent.SetContent then
+			parent:SetContent(tb)
 		end
 	end
 	return tb
@@ -119,6 +121,8 @@ function M.CreateBorder(parent, name, params)
 		end
 		if parent.AddChild then
 			parent:AddChild(border)
+		elseif parent.SetContent then
+			parent:SetContent(border)
 		end
 	end
 	return border

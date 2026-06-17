@@ -34,7 +34,7 @@ function M.Create()
 	-- Inner Canvas to place all graphical elements absolutely
 	local innerCanvasClass = StaticFindObject("/Script/UMG.CanvasPanel")
 	local innerCanvas = StaticConstructObject(innerCanvasClass, border, FName("OverlayInnerCanvas"))
-	border:AddChild(innerCanvas)
+	border:SetContent(innerCanvas)
 
 	-- Helper to place widgets on innerCanvas
 	local function Place(widget, x, y, w, h)
