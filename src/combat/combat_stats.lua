@@ -151,6 +151,12 @@ function M.Accumulate(state, snap)
     if #m > 0 then state.MoveScores = m end
   end
 
+  -- Try to discover star thresholds if not already found (up to 5 attempts to handle async load delay)
+  if not state.StarThresholds and (state.__thresholdAttempts or 0) < 5 then
+    state.__thresholdAttempts = (state.__thresholdAttempts or 0) + 1
+    discoverStarThresholds(state)
+  end
+
   -- 1. Star Rating Projection
   state.ProjectedStars = 0
   local subsys = GetMusicSubsystem()
@@ -163,13 +169,17 @@ function M.Accumulate(state, snap)
       state.ProjectedScore = projected
 
       -- Compare to thresholds (fall back to standard guesses if not discovered)
-      local thresh = state.StarThresholds or { [3] = 120000, [4] = 240000, [5] = 480000 }
+      local thresh = state.StarThresholds or { [1] = 40000, [2] = 80000, [3] = 120000, [4] = 240000, [5] = 480000 }
       if projected >= (thresh[5] or 480000) then
         state.ProjectedStars = 5
       elseif projected >= (thresh[4] or 240000) then
         state.ProjectedStars = 4
       elseif projected >= (thresh[3] or 120000) then
         state.ProjectedStars = 3
+      elseif projected >= (thresh[2] or 80000) then
+        state.ProjectedStars = 2
+      elseif projected >= (thresh[1] or 40000) then
+        state.ProjectedStars = 1
       else
         state.ProjectedStars = 0
       end
@@ -357,10 +367,10 @@ local function discoverStarThresholds(state)
     end
   end
 
-  -- 2. Try to read individual properties for stars 3, 4, 5
+  -- 2. Try to read individual properties for stars 1 to 5
   local t = {}
   local foundAny = false
-  for i = 3, 5 do
+  for i = 1, 5 do
     local field_names = {
       string.format("ScoreThreshold%d", i),
       string.format("StarThreshold%d", i),
@@ -379,7 +389,8 @@ local function discoverStarThresholds(state)
   end
   if foundAny then
     state.StarThresholds = t
-    log.info(string.format("[combat] Found star thresholds in individual fields: 3*=%s, 4*=%s, 5*=%s", tostring(t[3]), tostring(t[4]), tostring(t[5])))
+    log.info(string.format("[combat] Found star thresholds in individual fields: 1*=%s, 2*=%s, 3*=%s, 4*=%s, 5*=%s",
+      tostring(t[1]), tostring(t[2]), tostring(t[3]), tostring(t[4]), tostring(t[5])))
     return
   end
 end
@@ -406,6 +417,7 @@ function M.Reset(state)
   state.RecentSync = {}
   state.RecentSyncAvg = 0
   state.HypeStatus = "—"
+  state.__thresholdAttempts = 0
 
   discoverStarThresholds(state)
 end

@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.6] - 2026-06-17
+
+### Fixed
+- Star Rating Projection Build-up: Resolved the issue where the live projected star rating `Proj` showed `—` throughout gameplay on low or normal-scoring tracks. Added standard default milestones for passing 1-star (`40k`) and 2-star (`80k`) thresholds so the rating updates progressively from the start of the song. Also implemented an asynchronous retry counter inside `Accumulate` to attempt star threshold metadata discovery up to 5 times (over 2 seconds) to handle game playthrough data initialization delays.
+
 ## [0.4.5] - 2026-06-17
 
 ## [0.4.5] - 2026-06-17
@@ -14,8 +19,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Missing Move Data at Results: Fixed the issue where no move data was displayed on the results screen. Because mid-combat polling was disabled, and the game clears `CombatActionScores` immediately upon song completion before the UI constructs, the results screen hooks were reading an empty map. Restored move data capturing by polling `ReadMoveScores` safely during the song's ending window (the last 3 seconds of the track). During this window, combat has ceased, making it safe from concurrent mutation crashes, while the score component and map are still fully intact before the level transitions.
-
-## [0.4.4] - 2026-06-17
 
 ## [0.4.4] - 2026-06-17
 
