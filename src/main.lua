@@ -90,6 +90,7 @@ local function CaptureSongMetadata()
 					state.SongUniqueID = newUID
 					state.StarThresholds = nil
 					state.__thresholdAttempts = 0
+					pcall(function() state.CachedPB = history_handler.GetPB(state) end)
 					pcall(function() state.SongLengthSec = subsys:GetSongLengthSeconds() end)
 					pcall(function() state.SongIsImported = currentSong.bImportedSong end)
 					pcall(function()
