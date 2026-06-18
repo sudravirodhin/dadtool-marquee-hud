@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Dynamic Star Thresholds**: Implemented dynamic star score rating thresholds lookup from game memory. Matches active song keys and names fuzzy/case-insensitively, then queries loaded DataTables (`MusicParams.MusicParams` and challenge presets) dynamically to resolve actual thresholds, eliminating static guess fallbacks.
+
+### Changed
+- **F5 Keybind Simplification**: Reverted the slow, resource-heavy memory sweep on F5 to a lightweight status printer that logs active song metadata, resolved star thresholds, and live scores.
+
 ## [0.4.8] - 2026-06-17
 
 ### Changed
