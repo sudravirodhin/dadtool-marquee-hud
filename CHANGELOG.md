@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **HUD Personal Best (PB) Render**: Resolved an issue where the HUD Personal Best (`PB`) readout would show `nil` or fail to display when transitioning to a new song. Re-fetching the cached PB is now dynamically triggered inside the metadata loop tick immediately upon identifying a song change.
+
 ## [0.4.9] - 2026-06-18
 
 ### Added
