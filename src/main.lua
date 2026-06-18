@@ -281,6 +281,19 @@ RegisterKeyBind(Key.F5, function()
 		log.info(string.format("  Song: %s (Artist: %s, Key: %s, Imported: %s)",
 			tostring(state.SongName), tostring(state.SongArtist),
 			tostring(state.SongUniqueID), tostring(state.SongIsImported)))
+		log.info(string.format("  AssetPath: %s", tostring(state.AssetPath)))
+		log.info(string.format("  SongLengthSec: %s", tostring(state.SongLengthSec)))
+		
+		-- Print CachedPB info
+		if state.CachedPB then
+			log.info(string.format("  CachedPB: name=%s, score=%s, combo=%s, sync=%s, count=%s",
+				tostring(state.CachedPB.songName), tostring(state.CachedPB.highScore),
+				tostring(state.CachedPB.bestCombo), tostring(state.CachedPB.bestSync),
+				tostring(state.CachedPB.playCount)))
+		else
+			log.info("  CachedPB: nil")
+		end
+
 		if state.StarThresholds then
 			log.info(string.format("  Star Thresholds: 1*=%s, 2*=%s, 3*=%s, 4*=%s, 5*=%s",
 				tostring(state.StarThresholds[1]), tostring(state.StarThresholds[2]),
@@ -289,8 +302,8 @@ RegisterKeyBind(Key.F5, function()
 		else
 			log.info("  Star Thresholds: none resolved (using fallbacks)")
 		end
-		log.info(string.format("  Current Score: %d, Projected Stars: %d",
-			state.TotalScore or 0, state.ProjectedStars or 0))
+		log.info(string.format("  Current Score: %d, Projected Score: %s, Projected Stars: %d",
+			state.TotalScore or 0, tostring(state.ProjectedScore), state.ProjectedStars or 0))
 
 		-- DataTable dumper helper
 		local function dumpDataTable(dt_path, label)

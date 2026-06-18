@@ -154,6 +154,11 @@ function M.Sync(sessionState)
 	-- Ensure we use the absolute latest global state
 	local liveState = sessionState or _G.__SessionAggAccuracy
 
+	-- Periodically refresh active song metadata dynamically during play (every 400ms tick)
+	if _G.CaptureSongMetadata then
+		pcall(_G.CaptureSongMetadata)
+	end
+
 	-- Poll the game's OWN combat signals (score/combo/sync/mult) and fold them into
 	-- state — no per-move hooks. Then render the live snapshot.
 	local snap = combat_stats.Poll()

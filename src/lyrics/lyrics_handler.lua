@@ -199,12 +199,11 @@ function M.Tick()
 
   M._tickCount = (M._tickCount or 0) + 1
 
-  -- 1. Refresh metadata if needed (e.g., if we are early in the song or have unpopulated ID)
+  -- 1. Refresh metadata (poll early in the song to capture late-loading metadata)
   local state = _G.__SessionAggAccuracy
   if state then
-    local needsRefresh = not state.SongUniqueID or state.SongUniqueID == 0 or state.SongUniqueID == "0" or state.SongUniqueID == "" or state.SongName == "No Song"
-    -- Only try to refresh for the first ~5 seconds (80 ticks) to avoid ongoing CPU overhead
-    if needsRefresh and M._tickCount < 80 and _G.CaptureSongMetadata then
+    -- Try to refresh for the first ~5 seconds (80 ticks) to avoid ongoing CPU overhead
+    if M._tickCount < 80 and _G.CaptureSongMetadata then
       pcall(_G.CaptureSongMetadata)
     end
 
