@@ -7,7 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.10] - 2026-06-18
+
 ### Fixed
+
 - **HUD Personal Best (PB) Render**: Resolved an issue where the HUD Personal Best (`PB`) readout would show `nil` or fail to display when transitioning to a new song. Re-fetching the cached PB is now dynamically triggered inside the metadata loop tick immediately upon identifying a song change.
 
 ## [0.4.9] - 2026-06-18
@@ -170,7 +173,8 @@ _DiscoTracker upstream history below._
 - Accuracy and Combo monitoring.
 - HighScore persistence.
 
-[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.9...HEAD
+[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.10...HEAD
+[0.4.10]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.9...v0.4.10
 [0.4.9]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.8...v0.4.9
 [0.4.8]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.7...v0.4.8
 [0.4.7]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.6...v0.4.7
