@@ -88,6 +88,8 @@ local function CaptureSongMetadata()
 					state.SongName = newName
 					state.AssetPath = currentSong:GetFullName()
 					state.SongUniqueID = newUID
+					state.StarThresholds = nil
+					state.__thresholdAttempts = 0
 					pcall(function() state.SongLengthSec = subsys:GetSongLengthSeconds() end)
 					pcall(function() state.SongIsImported = currentSong.bImportedSong end)
 					pcall(function()

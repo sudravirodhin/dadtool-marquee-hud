@@ -92,7 +92,11 @@ function M.Update(state, snap)
 	if state and type(state.ProjectedStars) == "number" and state.ProjectedStars > 0 then
 		local stars_str = string.rep("★", state.ProjectedStars) .. string.rep("☆", 5 - state.ProjectedStars)
 		set("proj", stars_str, hud_utils.FSlateColor(1, 0.85, 0.2, 1))
+	elseif state and type(state.ProjectedScore) == "number" and state.ProjectedScore > 0 then
+		-- Projection is active, but is below 1-star threshold (0 stars projected)
+		set("proj", "☆☆☆☆☆", hud_utils.FSlateColor(1, 1, 1, 0.3))
 	else
+		-- Projection hasn't started yet (first 5 seconds of the song)
 		set("proj", "—", hud_utils.FSlateColor(1, 1, 1, 0.5))
 	end
 
