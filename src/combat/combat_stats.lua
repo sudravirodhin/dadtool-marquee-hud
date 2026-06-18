@@ -104,6 +104,85 @@ function M.SyncFraction(snap)
 end
 
 -- Find and cache the star score thresholds for the current song.
+-- Helper function to match song keys and names fuzzy/case-insensitive
+local function matchRowName(rname, songKey, songName)
+  rname = string.lower(rname)
+  if songKey then
+    local sk = string.lower(songKey)
+    if rname == sk or string.find(rname, sk) or string.find(sk, rname) then
+      return true
+    end
+  end
+  if songName then
+    local sn = string.lower(songName)
+    local sn_clean = sn:gsub("[%s%-_'\"&%!%*]", "")
+    local rname_clean = rname:gsub("[%s%-_'\"&%!%*]", "")
+    if rname_clean == sn_clean or string.find(rname_clean, sn_clean) or string.find(sn_clean, rname_clean) then
+      return true
+    end
+  end
+  return false
+end
+
+-- Helper to query a DataTable for star thresholds based on song details
+local function queryDataTableThresholds(dt_path, song_key, song_name)
+  local dt = StaticFindObject(dt_path)
+  if not dt or not dt:IsValid() or not dt.RowStruct or not dt.RowStruct:IsValid() then
+    return nil
+  end
+
+  local matched_val = nil
+  pcall(function()
+    dt.RowMap:ForEach(function(key, val)
+      local rname = key:ToString()
+      if matchRowName(rname, song_key, song_name) then
+        matched_val = val
+      end
+    end)
+  end)
+
+  if not matched_val then return nil end
+
+  local t = {}
+  local foundAny = false
+
+  pcall(function()
+    dt.RowStruct:ForEachProperty(function(p)
+      local pname = p:GetFName():ToString()
+      local pname_lower = string.lower(pname)
+      local pval = matched_val[pname]
+
+      if type(pval) == "number" then
+        local digit = tonumber(pname_lower:match("(%d)"))
+        if digit and digit >= 1 and digit <= 5 then
+          if string.find(pname_lower, "thresh") or string.find(pname_lower, "score") or string.find(pname_lower, "star") then
+            t[digit] = pval
+            foundAny = true
+          end
+        end
+      elseif type(pval) == "userdata" and pval.ForEach then
+        local arr = {}
+        pcall(function()
+          pval:ForEach(function(_, e)
+            local val_num = safe(function() return e:get() end) or e
+            if type(val_num) == "number" then table.insert(arr, val_num) end
+          end)
+        end)
+        if #arr >= 5 then
+          for i = 1, 5 do t[i] = arr[i] end
+          foundAny = true
+        end
+      end
+    end)
+  end)
+
+  if foundAny and t[1] and t[2] and t[3] and t[4] and t[5] then
+    return t
+  end
+  return nil
+end
+
+-- Find and cache the star score thresholds for the current song.
 local function discoverStarThresholds(state)
   state.StarThresholds = nil
   local ps = playerState()
@@ -112,52 +191,77 @@ local function discoverStarThresholds(state)
   local subsys = GetMusicSubsystem()
   local song = subsys and safe(function() return subsys:GetCurrentSong() end)
 
-  if not pd or not is_indexable(pd) then return end
-
-  -- 1. Try to read array-like properties
-  for _, name in ipairs({"StarThresholds", "ScoreThresholds", "StarsThresholds"}) do
-    local arr = safe(function() return pd[name] end) or (song and is_indexable(song) and safe(function() return song[name] end))
-    if arr and is_indexable(arr) then
-      local t = {}
-      pcall(function()
-        arr:ForEach(function(_, e)
-          local val = safe(function() return e:get() end) or e
-          if type(val) == "number" then table.insert(t, val) end
+  -- 1. Try to read array-like properties from PlaythroughData or Song
+  if pd and is_indexable(pd) then
+    for _, name in ipairs({"StarThresholds", "ScoreThresholds", "StarsThresholds"}) do
+      local arr = safe(function() return pd[name] end) or (song and is_indexable(song) and safe(function() return song[name] end))
+      if arr and is_indexable(arr) then
+        local t = {}
+        pcall(function()
+          arr:ForEach(function(_, e)
+            local val = safe(function() return e:get() end) or e
+            if type(val) == "number" then table.insert(t, val) end
+          end)
         end)
-      end)
-      if #t > 0 then
-        state.StarThresholds = t
-        log.info(string.format("[combat] Found star thresholds in array %s: %s", name, table.concat(t, ", ")))
-        return
+        if #t > 0 then
+          state.StarThresholds = t
+          log.info(string.format("[combat] Found star thresholds in array %s: %s", name, table.concat(t, ", ")))
+          return
+        end
       end
     end
   end
 
   -- 2. Try to read individual properties for stars 1 to 5
-  local t = {}
-  local foundAny = false
-  for i = 1, 5 do
-    local field_names = {
-      string.format("ScoreThreshold%d", i),
-      string.format("StarThreshold%d", i),
-      string.format("ScoreFor%dStars", i),
-      string.format("%dStarScore", i),
-      string.format("%dStarThreshold", i),
-    }
-    for _, name in ipairs(field_names) do
-      local val = safe(function() return pd[name] end) or (song and is_indexable(song) and safe(function() return song[name] end))
-      if type(val) == "number" then
-        t[i] = val
-        foundAny = true
-        break
+  if pd and is_indexable(pd) then
+    local t = {}
+    local foundAny = false
+    for i = 1, 5 do
+      local field_names = {
+        string.format("ScoreThreshold%d", i),
+        string.format("StarThreshold%d", i),
+        string.format("ScoreFor%dStars", i),
+        string.format("%dStarScore", i),
+        string.format("%dStarThreshold", i),
+      }
+      for _, name in ipairs(field_names) do
+        local val = safe(function() return pd[name] end) or (song and is_indexable(song) and safe(function() return song[name] end))
+        if type(val) == "number" then
+          t[i] = val
+          foundAny = true
+          break
+        end
       end
     end
+    if foundAny and t[1] and t[2] and t[3] and t[4] and t[5] then
+      state.StarThresholds = t
+      log.info(string.format("[combat] Found star thresholds in individual fields: 1*=%s, 2*=%s, 3*=%s, 4*=%s, 5*=%s",
+        tostring(t[1]), tostring(t[2]), tostring(t[3]), tostring(t[4]), tostring(t[5])))
+      return
+    end
   end
-  if foundAny then
-    state.StarThresholds = t
-    log.info(string.format("[combat] Found star thresholds in individual fields: 1*=%s, 2*=%s, 3*=%s, 4*=%s, 5*=%s",
-      tostring(t[1]), tostring(t[2]), tostring(t[3]), tostring(t[4]), tostring(t[5])))
-    return
+
+  -- 3. Dynamic DataTable query (Fuzzy key & name lookup)
+  local lyrics_resolver = safe(function() return require("lyrics.lyrics_resolver") end)
+  local resolved = lyrics_resolver and safe(function() return lyrics_resolver.Resolve(state) end)
+  local songKey = resolved and resolved.key
+  local songName = state.SongName
+
+  local dts = {
+    "/Game/MusicSystem/MusicParams.MusicParams",
+    "/Game/Pagoda/Levels/Test/DT_SongChallenges_IncursionPresets.DT_SongChallenges_IncursionPresets",
+    "/Game/Pagoda/Levels/Test/DT_IncursionPresets.DT_IncursionPresets",
+    "/Game/Pagoda/Levels/Test/DT_IncursionDefs.DT_IncursionDefs"
+  }
+
+  for _, dt_path in ipairs(dts) do
+    local t = queryDataTableThresholds(dt_path, songKey, songName)
+    if t then
+      state.StarThresholds = t
+      log.info(string.format("[combat] Dynamically resolved star thresholds from %s for %s (%s): 1*=%d, 2*=%d, 3*=%d, 4*=%d, 5*=%d",
+        dt_path, tostring(songKey), tostring(songName), t[1], t[2], t[3], t[4], t[5]))
+      return
+    end
   end
 end
 

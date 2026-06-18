@@ -272,6 +272,27 @@ end)
 
 
 
+-- ============ F5: Debug Status Print ============
+RegisterKeyBind(Key.F5, function()
+	ExecuteInGameThread(function()
+		local state = _G.__SessionAggAccuracy
+		log.info("[DEBUG_F5] Current Mod Status:")
+		log.info(string.format("  Song: %s (Artist: %s, Key: %s, Imported: %s)",
+			tostring(state.SongName), tostring(state.SongArtist),
+			tostring(state.SongUniqueID), tostring(state.SongIsImported)))
+		if state.StarThresholds then
+			log.info(string.format("  Star Thresholds: 1*=%s, 2*=%s, 3*=%s, 4*=%s, 5*=%s",
+				tostring(state.StarThresholds[1]), tostring(state.StarThresholds[2]),
+				tostring(state.StarThresholds[3]), tostring(state.StarThresholds[4]),
+				tostring(state.StarThresholds[5])))
+		else
+			log.info("  Star Thresholds: none resolved (using fallbacks)")
+		end
+		log.info(string.format("  Current Score: %d, Projected Stars: %d",
+			state.TotalScore or 0, state.ProjectedStars or 0))
+	end)
+end)
+
 -- ============ F6: Career Stats panel (toggle) ============
 RegisterKeyBind(Key.F6, function()
 	if stats_hud then ExecuteInGameThread(function() pcall(stats_hud.Toggle) end) end
