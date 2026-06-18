@@ -359,6 +359,8 @@ RegisterKeyBind(Key.F5, function()
 		dumpDataTable("/Game/Pagoda/UI/Game/Popup/DT_LevelSelectPopups.DT_LevelSelectPopups", "LevelSelectPopups")
 		dumpDataTable("/Game/Pagoda/Levels/InfiniteDisco/GameplayMoments/DT_GameplayMoments_InfiniteDisco.DT_GameplayMoments_InfiniteDisco", "GameplayMoments_InfiniteDisco")
 		dumpDataTable("/Game/Pagoda/Levels/InfiniteDisco/GameplayMoments/DT_GameplaySegments_InfiniteDisco.DT_GameplaySegments_InfiniteDisco", "GameplaySegments_InfiniteDisco")
+		dumpDataTable("/Game/Pagoda/Levels/Test/DT_IncursionProfiles_InfiniteDisco.DT_IncursionProfiles_InfiniteDisco", "IncursionProfiles_InfiniteDisco")
+		dumpDataTable("/Game/Pagoda/Levels/Test/DT_IncursionProfiles_InfiniteDisco_NewPlayer.DT_IncursionProfiles_InfiniteDisco_NewPlayer", "IncursionProfiles_InfiniteDisco_NewPlayer")
 	end)
 end)
 

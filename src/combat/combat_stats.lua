@@ -252,7 +252,9 @@ local function discoverStarThresholds(state)
     "/Game/MusicSystem/MusicParams.MusicParams",
     "/Game/Pagoda/Levels/Test/DT_SongChallenges_IncursionPresets.DT_SongChallenges_IncursionPresets",
     "/Game/Pagoda/Levels/Test/DT_IncursionPresets.DT_IncursionPresets",
-    "/Game/Pagoda/Levels/Test/DT_IncursionDefs.DT_IncursionDefs"
+    "/Game/Pagoda/Levels/Test/DT_IncursionDefs.DT_IncursionDefs",
+    "/Game/Pagoda/Levels/Test/DT_IncursionProfiles_InfiniteDisco.DT_IncursionProfiles_InfiniteDisco",
+    "/Game/Pagoda/Levels/Test/DT_IncursionProfiles_InfiniteDisco_NewPlayer.DT_IncursionProfiles_InfiniteDisco_NewPlayer"
   }
 
   for _, dt_path in ipairs(dts) do
