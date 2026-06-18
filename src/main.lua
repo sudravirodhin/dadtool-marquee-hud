@@ -290,6 +290,58 @@ RegisterKeyBind(Key.F5, function()
 		end
 		log.info(string.format("  Current Score: %d, Projected Stars: %d",
 			state.TotalScore or 0, state.ProjectedStars or 0))
+
+		-- DataTable dumper helper
+		local function dumpDataTable(dt_path, label)
+			local dt = StaticFindObject(dt_path)
+			if not dt or not dt:IsValid() then
+				log.info(string.format("  [DIAG_F5] DataTable %s (%s) is nil/invalid!", label, dt_path))
+				return
+			end
+			log.info(string.format("  [DIAG_F5] Dumping DataTable %s (%s):", label, dt_path))
+			if dt.RowStruct and dt.RowStruct:IsValid() then
+				log.info(string.format("    RowStruct: %s", dt.RowStruct:GetFullName()))
+				dt.RowStruct:ForEachProperty(function(p)
+					log.info(string.format("      Field: %s (%s)", p:GetFName():ToString(), p:GetClass():GetFName():ToString()))
+				end)
+			else
+				log.info("    RowStruct: nil")
+			end
+			local count = 0
+			pcall(function()
+				dt.RowMap:ForEach(function(key, val)
+					count = count + 1
+					if count > 50 then return end -- limit rows to avoid lag/crashing
+					local rname = key:ToString()
+					log.info(string.format("    Row: %s", rname))
+					if val and dt.RowStruct and dt.RowStruct:IsValid() then
+						dt.RowStruct:ForEachProperty(function(p)
+							local pname = p:GetFName():ToString()
+							local pval = "unknown"
+							pcall(function()
+								local raw = val[pname]
+								if raw == nil then pval = "nil"
+								elseif type(raw) == "userdata" and raw.GetFullName then pval = raw:GetFullName()
+								elseif type(raw) == "userdata" and raw.ToString then pval = raw:ToString()
+								else pval = tostring(raw) end
+							end)
+							log.info(string.format("      %s = %s", pname, pval))
+						end)
+					end
+				end)
+			end)
+			log.info(string.format("    Total rows dumped: %d", count))
+		end
+
+		-- Dump all relevant DataTables
+		dumpDataTable("/Game/MusicSystem/MusicParams.MusicParams", "MusicParams")
+		dumpDataTable("/Game/Pagoda/Levels/Test/DT_SongChallenges_IncursionPresets.DT_SongChallenges_IncursionPresets", "SongChallenges_IncursionPresets")
+		dumpDataTable("/Game/Pagoda/Levels/Test/DT_IncursionPresets.DT_IncursionPresets", "IncursionPresets")
+		dumpDataTable("/Game/Pagoda/Levels/Test/DT_IncursionDefs.DT_IncursionDefs", "IncursionDefs")
+		dumpDataTable("/Game/Pagoda/UI/Game/SongText/DT_SongText_Doll.DT_SongText_Doll", "SongText_Doll")
+		dumpDataTable("/Game/Pagoda/UI/Game/Popup/DT_LevelSelectPopups.DT_LevelSelectPopups", "LevelSelectPopups")
+		dumpDataTable("/Game/Pagoda/Levels/InfiniteDisco/GameplayMoments/DT_GameplayMoments_InfiniteDisco.DT_GameplayMoments_InfiniteDisco", "GameplayMoments_InfiniteDisco")
+		dumpDataTable("/Game/Pagoda/Levels/InfiniteDisco/GameplayMoments/DT_GameplaySegments_InfiniteDisco.DT_GameplaySegments_InfiniteDisco", "GameplaySegments_InfiniteDisco")
 	end)
 end)
 
