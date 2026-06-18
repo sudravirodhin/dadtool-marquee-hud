@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Synced Lyrics on Challenges: Fixed the issue where synced lyrics loaded and ran out of sync on challenge maps. Changed map-name gate to a dual-mode check that performs a deep inspection of `PagodaChallengeGameStateComponent`'s `CurrentChallenge` object to distinguish a real challenge run (premade or UGC) from standard Infinite Disco play (Free Play). This allows lyrics to run on normal Infinite Disco play while skipping them during challenge runs.
 - HUD Sync Loop Scoping Crash: Fixed a Lua runtime error (`attempt to call a nil value (global 'discoverStarThresholds')` in `combat_stats.lua` at line 157) that completely terminated the HUD sync loop on the first gameplay tick. Relocated `discoverStarThresholds` above `M.Accumulate` so it is in lexical scope, restoring the live projected stars calculation, PB ghost delta, and Hype updates.
 - Hype Status Emoji Render: Removed the fire emoji (🔥) from `"ON FIRE"` to prevent rendering issues where standard/default game fonts would display it as a white square or a `?` inside a diamond.
 - F5 Boot Loop Reversion: Reverted and removed the virtual C++ `APlayerController:PlayerTick` hook attempt which previously caused mod boot failures.
