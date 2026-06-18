@@ -322,11 +322,11 @@ RegisterKeyBind(Key.F5, function()
 				log.info("    RowStruct: nil")
 			end
 			local count = 0
-			pcall(function()
-				dt.RowMap:ForEach(function(key, val)
+			local ok, err = pcall(function()
+				dt:ForEachRow(function(rowName, val)
 					count = count + 1
-					if count > 50 then return end -- limit rows to avoid lag/crashing
-					local rname = key:ToString()
+					if count > 50 then return true end -- limit rows to avoid lag/crashing
+					local rname = tostring(rowName)
 					log.info(string.format("    Row: %s", rname))
 					if val and dt.RowStruct and dt.RowStruct:IsValid() then
 						dt.RowStruct:ForEachProperty(function(p)
@@ -344,6 +344,9 @@ RegisterKeyBind(Key.F5, function()
 					end
 				end)
 			end)
+			if not ok then
+				log.info(string.format("    ForEachRow failed: %s", tostring(err)))
+			end
 			log.info(string.format("    Total rows dumped: %d", count))
 		end
 

@@ -133,10 +133,11 @@ local function queryDataTableThresholds(dt_path, song_key, song_name)
 
   local matched_val = nil
   pcall(function()
-    dt.RowMap:ForEach(function(key, val)
-      local rname = key:ToString()
+    dt:ForEachRow(function(rowName, rowData)
+      local rname = tostring(rowName)
       if matchRowName(rname, song_key, song_name) then
-        matched_val = val
+        matched_val = rowData
+        return true -- stop early
       end
     end)
   end)
