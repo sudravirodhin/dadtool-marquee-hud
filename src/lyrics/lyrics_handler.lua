@@ -18,6 +18,8 @@ local engine = require("lyrics.lyrics_engine")
 local lyrics_hud = require("lyrics.lyrics_hud")
 local hud_handler = require("handlers.hud_handler")
 local hud_utils = require("utils.hud_utils")
+local UEHelpers = require("UEHelpers")
+
 
 
 -- DEBUG: last Tick stage, written to a file so a native crash localizes precisely.
@@ -51,6 +53,18 @@ local function is_indexable(obj)
   end
   return false
 end
+
+local function getMapId()
+  local id = nil
+  pcall(function()
+    local world = UEHelpers.GetWorld()
+    if world and is_indexable(world) and world:IsValid() then
+      id = world:GetFullName()
+    end
+  end)
+  return id
+end
+
 
 local function getSubsys()
   if M._subsys then
@@ -87,6 +101,27 @@ function M.OnSongStart(state)
 
   M._songKey = info.key
   M._songOffset = store.LoadOffset(info.key)   -- per-song manual sync correction
+
+  -- Skip lyrics completely on challenge / infinite maps to prevent timing drift issues
+  if cfg.LYRICS_DISABLE_ON_CHALLENGES ~= false then
+    local map = getMapId()
+    if map then
+      local low = map:lower()
+      local isChallenge = false
+      local ch_names = cfg.CHALLENGE_MAP_NAMES or { "challenge", "infinitedisco" }
+      for _, frag in ipairs(ch_names) do
+        if low:find(frag, 1, true) then
+          isChallenge = true
+          break
+        end
+      end
+      if isChallenge then
+        log.info(string.format("[lyrics] challenge or infinite map detected (%s), skipping lyrics", map))
+        lyrics_hud.Hide()
+        return
+      end
+    end
+  end
 
   -- Load + parse BEFORE drawing anything: the karaoke bar is created only when we
   -- actually have lyrics (or a brief notice to show), never just to sit there empty.

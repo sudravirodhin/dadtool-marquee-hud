@@ -210,16 +210,27 @@ LoopAsync(HEARTBEAT_MS, function()
 	return false
 end)
 
+-- Safe game-thread loop helper to prevent Lua VM multi-threading data races (ltable.c crashes).
+-- Uses LoopInGameThreadWithDelay if supported, falling back to LoopAsync + ExecuteInGameThread.
+local function StartGameThreadLoop(intervalMs, callback)
+	if LoopInGameThreadWithDelay then
+		LoopInGameThreadWithDelay(intervalMs, callback)
+	else
+		LoopAsync(intervalMs, function()
+			ExecuteInGameThread(callback)
+			return false
+		end)
+	end
+end
+
 -- HUD sync loop: hud_handler.Sync polls the game's combat signals + renders (IN_GAME only)
-LoopAsync(cfg.HUD_UPDATE_INTERVAL_MS, function()
-	ExecuteInGameThread(function() hud_handler.Sync(_G.__SessionAggAccuracy) end)
-	return false
+StartGameThreadLoop(cfg.HUD_UPDATE_INTERVAL_MS, function()
+	hud_handler.Sync(_G.__SessionAggAccuracy)
 end)
 
 -- lyrics sync loop
-LoopAsync(cfg.LYRICS_TICK_MS or 60, function()
-	ExecuteInGameThread(function() if lyrics_handler then pcall(lyrics_handler.Tick) end end)
-	return false
+StartGameThreadLoop(cfg.LYRICS_TICK_MS or 60, function()
+	if lyrics_handler then pcall(lyrics_handler.Tick) end
 end)
 
 
