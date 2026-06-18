@@ -1021,12 +1021,20 @@ Analysis of playthrough save data (`PagodaSaveData_PlayerPlaythrough` struct and
 
 ---
 
-## 6. Current Star Threshold Logic (Fallback)
-Currently, `combat_stats.lua` falls back to these static threshold assumptions when song-specific thresholds cannot be resolved dynamically:
+## 6. Current Star Threshold Logic (Dynamic + Fallback)
+The mod dynamically resolves star thresholds by searching song rows in the following DataTables (fuzzy matching against the song name and key):
+- `/Game/MusicSystem/MusicParams.MusicParams`
+- `/Game/Pagoda/Levels/Test/DT_SongChallenges_IncursionPresets.DT_SongChallenges_IncursionPresets`
+- `/Game/Pagoda/Levels/Test/DT_IncursionPresets.DT_IncursionPresets`
+- `/Game/Pagoda/Levels/Test/DT_IncursionDefs.DT_IncursionDefs`
+- `/Game/Pagoda/Levels/Test/DT_IncursionProfiles_InfiniteDisco.DT_IncursionProfiles_InfiniteDisco`
+- `/Game/Pagoda/Levels/Test/DT_IncursionProfiles_InfiniteDisco_NewPlayer.DT_IncursionProfiles_InfiniteDisco_NewPlayer`
+
+When querying these DataTables, the mod uses the stable UE4SS Lua method `dt:ForEachRow(function(rowName, rowData) ... end)` to retrieve row contents (avoiding direct `dt.RowMap:ForEach()` which is unsupported/unstable in UE4SS Lua).
+
+If a song cannot be resolved in any of the tables, the mod falls back to these static threshold assumptions:
 - **1 Star:** 40,000 score
 - **2 Stars:** 80,000 score
 - **3 Stars:** 120,000 score
 - **4 Stars:** 240,000 score
 - **5 Stars:** 480,000 score
-
-We are actively staging the dynamic threshold resolution from `MusicParams` rows (layout: `MusicTableStructure`) and `IncursionProfiles` (`DT_IncursionProfiles_InfiniteDisco`) mapped on active challenges.
