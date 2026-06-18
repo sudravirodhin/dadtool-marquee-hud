@@ -104,22 +104,46 @@ function M.OnSongStart(state)
 
   -- Skip lyrics completely on challenge / infinite maps to prevent timing drift issues
   if cfg.LYRICS_DISABLE_ON_CHALLENGES ~= false then
+    local isChallenge = false
     local map = getMapId()
     if map then
       local low = map:lower()
-      local isChallenge = false
-      local ch_names = cfg.CHALLENGE_MAP_NAMES or { "challenge", "infinitedisco" }
+      local ch_names = cfg.CHALLENGE_MAP_NAMES or { "challenge" }
       for _, frag in ipairs(ch_names) do
         if low:find(frag, 1, true) then
           isChallenge = true
           break
         end
       end
-      if isChallenge then
-        log.info(string.format("[lyrics] challenge or infinite map detected (%s), skipping lyrics", map))
-        lyrics_hud.Hide()
-        return
-      end
+    end
+
+    -- If map-name check didn't flag it, check PagodaChallengeGameStateComponent to distinguish 
+    -- standard Infinite Disco play from actual challenges (premade or UGC).
+    if not isChallenge then
+      pcall(function()
+        local comps = FindAllOf("PagodaChallengeGameStateComponent")
+        local comp = comps and comps[1]
+        if comp and comp:IsValid() then
+          local cc = comp.CurrentChallenge
+          if cc and cc:IsValid() then
+            local name = cc:GetFName():ToString()
+            local outer = cc:GetOuter()
+            local outerClass = (outer and outer:IsValid() and outer:GetClass():GetFName():ToString()) or ""
+            -- Default Free Play (standard Infinite Disco) has name == "DA_Challenge_" and outerClass == "BP_PagodaChallengeData_C"
+            -- Real/UGC challenges have outerClass == "Package" and custom names.
+            if outerClass == "Package" or name ~= "DA_Challenge_" then
+              isChallenge = true
+              log.debug(string.format("[lyrics] active challenge detected via object checks: name=%s outerClass=%s", name, outerClass))
+            end
+          end
+        end
+      end)
+    end
+
+    if isChallenge then
+      log.info("[lyrics] challenge map or active challenge detected, skipping lyrics")
+      lyrics_hud.Hide()
+      return
     end
   end
 

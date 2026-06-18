@@ -269,6 +269,7 @@ end)
 
 
 
+
 -- ============ F6: Career Stats panel (toggle) ============
 RegisterKeyBind(Key.F6, function()
 	if stats_hud then ExecuteInGameThread(function() pcall(stats_hud.Toggle) end) end
