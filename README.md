@@ -20,7 +20,7 @@ It is a fork of **[DiscoTracker](https://github.com/lucashort7/dad-performance-t
 - **Post-song report** — a score-share breakdown (which moves earned what, as a % of the run plus compact totals), Stars earned, sync avg/peak, and a level-up hero panel.
 - **Leveling** — sync-weighted XP, levels, and titles that persist across sessions.
 - **Career Stats (F6)** — most-played tracks, top scores, and your level, aggregated from local history.
-- **Live glance** — a small bottom-left panel showing your PB, live Sync %, live Star rating projection (e.g. 3★/4★/5★), PB Delta trajectory comparison, and dynamic "ON FIRE" Hype indicator.
+- **Live glance** — a small bottom-left panel showing your PB, live Sync %, live Perfect Sync Streak (current / peak), PB Delta trajectory comparison, active song BPM, and dynamic "ON FIRE" Hype indicator.
 - **Hub badge** — a quiet "Marquee ON" indicator, shown only in The Encore.
 
 ## Why the rewrite?
@@ -76,6 +76,33 @@ Marquee is **display-only** for lyrics: it reads cached `.lrc` files but never f
 | `LYRICS_ENABLED` | `true` | Master lyrics on/off (also toggled with F2). |
 | `LYRICS_DUMP_CATALOG` | `true` | At boot: dump the full song-catalog manifest (`_catalog.jsonl`) for the importer (dadtool). |
 | `LEVELING_ENABLED` | `true` | Track XP and levels. |
+
+## Leveling & Titles
+
+Marquee features a progression system with 20 levels. XP is earned by completing songs, calculated as the song's score weighted by your average sync accuracy.
+
+| Level | Title | Cumulative XP | Tier |
+|---|---|---|---|
+| **1** | Wallflower | 0 | Sky Blue (Beginner) |
+| **2** | Toe-Tapper | 50,000 | Sky Blue (Beginner) |
+| **3** | Two-Stepper | 150,000 | Sky Blue (Beginner) |
+| **4** | The Shuffler | 300,000 | Sky Blue (Beginner) |
+| **5** | Boogie Cadet | 550,000 | Emerald (Groove) |
+| **6** | Funky Footwork | 900,000 | Emerald (Groove) |
+| **7** | The Bus Stop | 1,400,000 | Emerald (Groove) |
+| **8** | Hustle Hopeful | 2,100,000 | Emerald (Groove) |
+| **9** | Groove Rider | 3,000,000 | Emerald (Groove) |
+| **10** | The Robot | 4,200,000 | Cyan (Flashy) |
+| **11** | Mirrorball Mover | 5,800,000 | Cyan (Flashy) |
+| **12** | Moonwalker | 7,800,000 | Cyan (Flashy) |
+| **13** | Boogie Wonder | 10,400,000 | Cyan (Flashy) |
+| **14** | Funk Commander | 13,500,000 | Pink (Master) |
+| **15** | Saturday Night Fever | 17,500,000 | Pink (Master) |
+| **16** | Nonstop Hustler | 22,500,000 | Pink (Master) |
+| **17** | Discotheque Don | 29,000,000 | Pink (Master) |
+| **18** | Studio 54 Royalty | 37,000,000 | Gold (Legend) |
+| **19** | Disco Inferno | 47,000,000 | Gold (Legend) |
+| **20** | Eternal Groovemaster | 60,000,000 | Gold (Legend) |
 
 ## Credits & License
 
