@@ -112,6 +112,8 @@ jobs:
 
       - name: generate release body
         if: ${{ !inputs.is-dry-run }}
+        env:
+          RELEASE_NOTES: ${{ steps.changelog.outputs.release-notes }}
         run: |
           mkdir -p build
           cat << 'EOF' > build/release_body.md
@@ -121,7 +123,7 @@ jobs:
 
           EOF
           
-          echo "${{ steps.changelog.outputs.release-notes }}" >> build/release_body.md
+          printf "%s\n" "$RELEASE_NOTES" >> build/release_body.md
           
           cat << 'EOF' >> build/release_body.md
 
