@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **HUD Sync/Streak Freeze**: Fixed an issue where the live progress HUD (Sync and Streak rows) would stop updating or freeze on screen across song transitions. This was caused by caching local references to the game's `PlayerState` and `ScoreComponent`, which could point to stale C++ objects. The mod now queries these dynamically from the active `PlayerController` on each tick.
+
 ## [0.4.11] - 2026-06-19
 
 ### Added
