@@ -73,7 +73,6 @@ jobs:
           
           cd ../..
           mv "$ARTIFACT_NAME" "${{ env.BUILD_DIR }}/$ARTIFACT_NAME"
-
       - name: generate standalone clean zip
         run: |
           # define local temporary paths
@@ -88,6 +87,10 @@ jobs:
           
           # create enabled file at standalone mod root
           touch "$STANDALONE_STAGING/enabled.txt"
+          
+          # add documentation and meta files
+          [ -d "docs" ] && cp -r docs "$STANDALONE_STAGING/"
+          cp LICENSE README.md ${{ env.CHANGELOG_FILE }} "$STANDALONE_STAGING/"
           
           # enter staging folder and zip keeping root mod folder
           cd build/staging_standalone
@@ -113,7 +116,7 @@ jobs:
       - name: generate release body
         if: ${{ !inputs.is-dry-run }}
         env:
-          RELEASE_NOTES: ${{ steps.changelog.outputs.release-notes }}
+          RELEASE_TAG: ${{ inputs.tag }}
         run: |
           mkdir -p build
           cat << 'EOF' > build/release_body.md
@@ -123,7 +126,18 @@ jobs:
 
           EOF
           
-          printf "%s\n" "$RELEASE_NOTES" >> build/release_body.md
+          python3 -c "
+          import os, re
+          tag = os.environ['RELEASE_TAG']
+          version = tag.lstrip('v')
+          content = open('CHANGELOG.md', 'r', encoding='utf-8').read()
+          pattern = r'(##\s+\[?v?' + re.escape(version) + r'\]?.*?)(?=\n##\s+\[?v?\d+\.\d+\.\d+\]?|\Z)'
+          match = re.search(pattern, content, re.DOTALL)
+          if match:
+              lines = match.group(1).strip().splitlines()
+              if len(lines) > 1:
+                  print('\n'.join(lines[1:]).strip())
+          " >> build/release_body.md
           
           cat << 'EOF' >> build/release_body.md
 
@@ -131,9 +145,9 @@ jobs:
 
           ### Distribution Packages
 
-          * **`Marquee-${{ inputs.tag }}.zip` (Full Bundle - Recommended)**: Contains both the Marquee mod and our custom-compiled, stable UE4SS loader binaries. Recommended for most users to ensure game stability.
-          * **`Marquee-STANDALONE-${{ inputs.tag }}.zip` (Mod-Only Standalone)**: Contains only the `Marquee` mod folder. Choose this if you already have a working UE4SS setup and want to manage the loader yourself.
-          * **`UE4SS-custom-${{ inputs.tag }}.zip` (UE4SS Binaries Only)**: Contains only our custom-compiled, stable UE4SS loader binaries configured for *Dead as Disco*. Choose this if you want our crash-free UE4SS setup to run other mods without installing the Marquee HUD.
+          * **`Marquee-${{ env.RELEASE_TAG }}.zip` (Full Bundle - Recommended)**: Contains both the Marquee mod and our custom-compiled, stable UE4SS loader binaries. Recommended for most users to ensure game stability.
+          * **`Marquee-STANDALONE-${{ env.RELEASE_TAG }}.zip` (Mod-Only Standalone)**: Contains only the `Marquee` mod folder. Choose this if you already have a working UE4SS setup and want to manage the loader yourself.
+          * **`UE4SS-custom-${{ env.RELEASE_TAG }}.zip` (UE4SS Binaries Only)**: Contains only our custom-compiled, stable UE4SS loader binaries configured for *Dead as Disco*. Choose this if you want our crash-free UE4SS setup to run other mods without installing the Marquee HUD.
 
           > [!WARNING]
           > Upstream/standard UE4SS versions are currently prone to native loader bugs (e.g. use-after-free hook crashes on game build `CL-29008`). Our custom-built loader is optimized to bypass these crashes.
@@ -150,7 +164,7 @@ jobs:
         if: ${{ !inputs.is-dry-run }}
         run: |
           git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@://github.com"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add ${{ env.CHANGELOG_FILE }}
           git commit -m "chore: release ${{ inputs.tag }}"
           git tag -a ${{ inputs.tag }} -m "release ${{ inputs.tag }}"
