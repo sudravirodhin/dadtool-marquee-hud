@@ -267,6 +267,15 @@ local function discoverStarThresholds(state)
     end
   end
 
+  -- 4. UGC / Custom Song Fallback: Query "FirstRound" from DT_IncursionProfiles_InfiniteDisco
+  local ugc_thresh = queryDataTableThresholds("/Game/Pagoda/Levels/Test/DT_IncursionProfiles_InfiniteDisco.DT_IncursionProfiles_InfiniteDisco", "FirstRound", "FirstRound")
+  if ugc_thresh then
+    state.StarThresholds = ugc_thresh
+    log.info(string.format("[combat] Staged custom/UGC song thresholds from DT_IncursionProfiles_InfiniteDisco (FirstRound): 1*=%d, 2*=%d, 3*=%d, 4*=%d, 5*=%d",
+      ugc_thresh[1], ugc_thresh[2], ugc_thresh[3], ugc_thresh[4], ugc_thresh[5]))
+    return
+  end
+
   -- Fallback logging & debug row name extraction
   log.info(string.format("[combat] Threshold resolution failed for %s (%s) — using default fallback thresholds.", tostring(songKey), tostring(songName)))
   pcall(function()
