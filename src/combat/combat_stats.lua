@@ -93,6 +93,10 @@ function M.Poll()
     out.maxSync = attr(poas, "MaxMusicSyncMeter")
     out.mult    = attr(poas, "CombatScoreGainMult")
   end
+  local subsys = GetMusicSubsystem()
+  if subsys then
+    out.bpm = safe(function() return subsys:GetBPM() end)
+  end
   return out
 end
 
@@ -125,6 +129,7 @@ function M.Accumulate(state, snap)
   end
   if type(snap.score) == "number" then state.TotalScore = snap.score end
   if type(snap.mult)  == "number" then state.Multiplier = snap.mult end
+  if type(snap.bpm)   == "number" and snap.bpm > 0 then state.Bpm = snap.bpm end
 
   -- Capture the per-move breakdown: either throughout play if configured (throttled),
   -- or safely during the song's ending window (last 3 seconds) when combat has ceased (unthrottled).

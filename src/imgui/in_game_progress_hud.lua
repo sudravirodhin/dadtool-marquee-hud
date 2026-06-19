@@ -32,12 +32,12 @@ function M.Create()
 	end
 
 	-- Setup HUD elements aligned to 6-character labels for perfect spacing
-	row("PB    ", "pb")
-	row("Delta ", "pb_delta")
+	row("BPM   ", "bpm")
 	row("Sync  ", "sync", hud_utils.SyncColor(1))
 	row("Streak", "streak")
+	row("PB    ", "pb")
+	row("Delta ", "pb_delta")
 	row("Hype  ", "hype")
-	row("BPM   ", "bpm")
 
 	umg_factory.ApplyAlignment(canvas, border, cfg.HUD_MAIN_ALLIGNMENT or "topright",
 		{ X = cfg.HUD_POS_X or -25, Y = cfg.HUD_POS_Y or 95 })
@@ -65,31 +65,21 @@ function M.Update(state, snap)
 
 	local frac = combat_stats.SyncFraction(snap)
 
-	-- 1. PB to beat
-	if state and state.CachedPB and state.CachedPB.highScore and state.CachedPB.highScore > 0 then
-		set("pb", hud_utils.Abbrev(state.CachedPB.highScore))
+	-- 1. Song BPM (Tempo)
+	if state and type(state.Bpm) == "number" and state.Bpm > 0 then
+		set("bpm", string.format("%d", math.floor(state.Bpm + 0.5)))
 	else
-		set("pb", "—")
+		set("bpm", "—", hud_utils.FSlateColor(1, 1, 1, 0.5))
 	end
 
-	-- 2. Live PB Delta (ghost tracker)
-	if state and type(state.PbDelta) == "number" then
-		local d = state.PbDelta
-		local prefix = d >= 0 and "+" or ""
-		local color = d >= 0 and hud_utils.FSlateColor(0.1, 1, 0.1, 0.9) or hud_utils.FSlateColor(1, 0.2, 0.2, 0.9)
-		set("pb_delta", string.format("%s%s", prefix, hud_utils.Commafy(math.floor(d + 0.5))), color)
-	else
-		set("pb_delta", "—", hud_utils.FSlateColor(1, 1, 1, 0.5))
-	end
-
-	-- 3. Live sync %
+	-- 2. Live sync %
 	if frac then
 		set("sync", string.format("%d%%", math.floor(frac * 100 + 0.5)), hud_utils.SyncColor(frac))
 	else
 		set("sync", "—")
 	end
 
-	-- 4. Perfect Streak (Sync Streak)
+	-- 3. Perfect Streak (Sync Streak)
 	if state and type(state.SyncStreak) == "number" and type(state.SyncStreakMax) == "number" then
 		local current = state.SyncStreak
 		local max = state.SyncStreakMax
@@ -99,7 +89,24 @@ function M.Update(state, snap)
 		set("streak", "—", hud_utils.FSlateColor(1, 1, 1, 0.5))
 	end
 
-	-- 5. Hype status and flare-up indicator
+	-- 4. PB to beat
+	if state and state.CachedPB and state.CachedPB.highScore and state.CachedPB.highScore > 0 then
+		set("pb", hud_utils.Abbrev(state.CachedPB.highScore))
+	else
+		set("pb", "—")
+	end
+
+	-- 5. Live PB Delta (ghost tracker)
+	if state and type(state.PbDelta) == "number" then
+		local d = state.PbDelta
+		local prefix = d >= 0 and "+" or ""
+		local color = d >= 0 and hud_utils.FSlateColor(0.1, 1, 0.1, 0.9) or hud_utils.FSlateColor(1, 0.2, 0.2, 0.9)
+		set("pb_delta", string.format("%s%s", prefix, hud_utils.Commafy(math.floor(d + 0.5))), color)
+	else
+		set("pb_delta", "—", hud_utils.FSlateColor(1, 1, 1, 0.5))
+	end
+
+	-- 6. Hype status and flare-up indicator
 	if state and state.HypeStatus then
 		local is_on_fire = (state.HypeStatus == "ON FIRE")
 		local color = is_on_fire and hud_utils.FSlateColor(1, 0.5, 0, 1) or hud_utils.FSlateColor(1, 1, 1, 0.5)
@@ -119,13 +126,6 @@ function M.Update(state, snap)
 		end
 	else
 		set("hype", "—", hud_utils.FSlateColor(1, 1, 1, 0.5))
-	end
-
-	-- 6. Song BPM (Tempo)
-	if state and type(state.Bpm) == "number" and state.Bpm > 0 then
-		set("bpm", string.format("%d", math.floor(state.Bpm + 0.5)))
-	else
-		set("bpm", "—", hud_utils.FSlateColor(1, 1, 1, 0.5))
 	end
 end
 
