@@ -32,19 +32,16 @@ local function safe(fn) local ok, r = pcall(fn); if ok then return r end end
 local function valid(o) return is_valid(o) end
 
 -- ---- cached handles (re-fetched whenever they go invalid, e.g. after a map load) ----
-local _sc, _ps
 local _diagged = false   -- one-shot move-key diagnostic (logs once ever, not per read)
 local function scoreComp()
-  if valid(_sc) then return _sc end
   local pc = safe(function() return is_indexable(UEHelpers) and UEHelpers.GetPlayerController() end)
-  _sc = (pc and is_indexable(pc) and safe(function() return pc:GetScoreComponent() end)) or nil
-  return valid(_sc) and _sc or nil
+  local sc = (pc and is_indexable(pc) and safe(function() return pc:GetScoreComponent() end)) or nil
+  return valid(sc) and sc or nil
 end
 local function playerState()
-  if valid(_ps) then return _ps end
   local pc = safe(function() return is_indexable(UEHelpers) and UEHelpers.GetPlayerController() end)
-  _ps = (pc and is_indexable(pc) and safe(function() return pc.PlayerState end)) or nil
-  return valid(_ps) and _ps or nil
+  local ps = (pc and is_indexable(pc) and safe(function() return pc.PlayerState end)) or nil
+  return valid(ps) and ps or nil
 end
 
 local _musicSubsys = nil
@@ -323,7 +320,6 @@ function M.Reset(state)
   state.__moveTick = 0
   state.FinalAvgSync, state.FinalPeakSync = nil, nil
   state.StarsAtEnd, state.StarsEarned = nil, nil
-  _sc, _ps = nil, nil                 -- drop stale handles so the new song re-fetches
   state.StarsStart = M.ReadStars()    -- baseline for "stars earned this song"
 
   -- Clear and initialize our features' state
