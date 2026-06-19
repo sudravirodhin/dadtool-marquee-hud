@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.12] - 2026-06-19
+
 ### Fixed
 
 - **HUD Sync/Streak Freeze**: Fixed an issue where the live progress HUD (Sync and Streak rows) would stop updating or freeze on screen across song transitions. This was caused by caching local references to the game's `PlayerState` and `ScoreComponent`, which could point to stale C++ objects. The mod now queries these dynamically from the active `PlayerController` on each tick.
@@ -190,7 +192,8 @@ _DiscoTracker upstream history below._
 - Accuracy and Combo monitoring.
 - HighScore persistence.
 
-[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.11...HEAD
+[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.12...HEAD
+[0.4.12]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.11...v0.4.12
 [0.4.11]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.10...v0.4.11
 [0.4.10]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.9...v0.4.10
 [0.4.9]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.8...v0.4.9
