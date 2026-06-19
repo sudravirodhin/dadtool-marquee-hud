@@ -41,7 +41,7 @@ cfg.LYRICS_NUDGE_STEP = 0.1        -- seconds per F9/F10 lyric-offset nudge
 cfg.LYRICS_READY_MIN_WAIT = 4      -- show "lyrics ready" only if the first line is >N sec away
 cfg.LYRICS_DEBUG = false           -- true = write per-tick stage to _tick_stage.txt (crash localization)
 cfg.LYRICS_DUMP_CATALOG = true     -- at boot: dump the full song-catalog manifest (_catalog.jsonl) for dadtool
-cfg.LYRICS_DISABLE_ON_CHALLENGES = true -- skip loading lyrics on challenge/infinite maps due to drift/loops
+cfg.LYRICS_DISABLE_ON_CHALLENGES = false -- skip loading lyrics on challenge/infinite maps due to drift/loops (disabled by default)
 cfg.CHALLENGE_MAP_NAMES = { "challenge" } -- case-insensitive level/map path substrings to identify challenges
 
 --[[
