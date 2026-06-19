@@ -326,6 +326,7 @@ function M.Reset(state)
   state.RecentSync = {}
   state.RecentSyncAvg = 0
   state.HypeStatus = "—"
+  state.Bpm = nil
 end
 
 return M

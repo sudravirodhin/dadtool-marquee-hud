@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Perfect Streak Live HUD Display**: Added a live `Streak` row to the in-game progress HUD showing the player's current sync streak (consecutive on-beat ticks >= 95% sync) against their peak sync streak for the run (e.g. `12 / 85`). Reuses already-polled sync fraction metrics for zero per-tick polling cost.
 - **Dynamic Streak Success Feedback**: The Streak values dynamically turn green when the player is active and currently setting a new peak streak for the song, providing satisfying live visual feedback.
+- **Live Song BPM Tracker**: Added a `BPM` row to the in-game progress HUD showing the song's tempo in beats per minute, queried once on song change (zero per-tick polling cost).
 
 ### Removed
 

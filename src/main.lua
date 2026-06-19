@@ -92,6 +92,7 @@ local function CaptureSongMetadata()
 					pcall(function() state.CachedPB = history_handler.GetPB(state) end)
 					pcall(function() state.SongLengthSec = subsys:GetSongLengthSeconds() end)
 					pcall(function() state.SongIsImported = currentSong.bImportedSong end)
+					pcall(function() state.Bpm = subsys:GetBPM() end)
 					pcall(function()
 						-- NEVER index a TArray directly: use GetFirstTArrayElement to safely retrieve
 						-- and unwrap the element, avoiding out-of-bounds native crashes.
@@ -277,9 +278,10 @@ RegisterKeyBind(Key.F5, function()
 	ExecuteInGameThread(function()
 		local state = _G.__SessionAggAccuracy
 		log.info("[DEBUG_F5] Current Mod Status:")
-		log.info(string.format("  Song: %s (Artist: %s, Key: %s, Imported: %s)",
+		log.info(string.format("  Song: %s (Artist: %s, Key: %s, Imported: %s, BPM: %s)",
 			tostring(state.SongName), tostring(state.SongArtist),
-			tostring(state.SongUniqueID), tostring(state.SongIsImported)))
+			tostring(state.SongUniqueID), tostring(state.SongIsImported),
+			tostring(state.Bpm)))
 		log.info(string.format("  AssetPath: %s", tostring(state.AssetPath)))
 		log.info(string.format("  SongLengthSec: %s", tostring(state.SongLengthSec)))
 		

@@ -37,6 +37,7 @@ function M.Create()
 	row("Sync  ", "sync", hud_utils.SyncColor(1))
 	row("Streak", "streak")
 	row("Hype  ", "hype")
+	row("BPM   ", "bpm")
 
 	umg_factory.ApplyAlignment(canvas, border, cfg.HUD_MAIN_ALLIGNMENT or "topright",
 		{ X = cfg.HUD_POS_X or -25, Y = cfg.HUD_POS_Y or 95 })
@@ -118,6 +119,13 @@ function M.Update(state, snap)
 		end
 	else
 		set("hype", "—", hud_utils.FSlateColor(1, 1, 1, 0.5))
+	end
+
+	-- 6. Song BPM (Tempo)
+	if state and type(state.Bpm) == "number" and state.Bpm > 0 then
+		set("bpm", string.format("%d", math.floor(state.Bpm + 0.5)))
+	else
+		set("bpm", "—", hud_utils.FSlateColor(1, 1, 1, 0.5))
 	end
 end
 
