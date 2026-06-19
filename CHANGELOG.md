@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Perfect Streak Live HUD Display**: Added a live `Streak` row to the in-game progress HUD showing the player's current sync streak (consecutive on-beat ticks >= 95% sync) against their peak sync streak for the run (e.g. `12 / 85`). Reuses already-polled sync fraction metrics for zero per-tick polling cost.
+- **Dynamic Streak Success Feedback**: The Streak values dynamically turn green when the player is active and currently setting a new peak streak for the song, providing satisfying live visual feedback.
+
+### Removed
+
+- **Projected Star Rating (`Proj`)**: Reverted and removed all star rating projection and DataTable-querying logic from combat stats and the HUD, as dynamic star structures and UGC/custom song variances made projection unreliable and prone to thread freezes.
+- **Heavy DataTable Memory Sweeps**: Removed the resource-heavy DataTable property iterations from the debug `F5` keybind to eliminate main game thread locking. The F5 keybind is now a lightweight, thread-safe status logger that prints active variables only.
+
 ## [0.4.10] - 2026-06-18
 
 ### Fixed
