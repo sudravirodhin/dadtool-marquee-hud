@@ -35,7 +35,7 @@ function M.Create()
 	row("PB    ", "pb")
 	row("Delta ", "pb_delta")
 	row("Sync  ", "sync", hud_utils.SyncColor(1))
-	row("Proj  ", "proj")
+	row("Streak", "streak")
 	row("Hype  ", "hype")
 
 	umg_factory.ApplyAlignment(canvas, border, cfg.HUD_MAIN_ALLIGNMENT or "topright",
@@ -88,15 +88,14 @@ function M.Update(state, snap)
 		set("sync", "—")
 	end
 
-	-- 4. Projected Star Rating
-	if state and type(state.ProjectedStars) == "number" and state.ProjectedStars > 0 then
-		set("proj", string.format("%d / 5", state.ProjectedStars), hud_utils.FSlateColor(1, 0.85, 0.2, 1))
-	elseif state and type(state.ProjectedScore) == "number" and state.ProjectedScore > 0 then
-		-- Projection is active, but is below 1-star threshold (0 stars projected)
-		set("proj", "0 / 5", hud_utils.FSlateColor(1, 1, 1, 0.3))
+	-- 4. Perfect Streak (Sync Streak)
+	if state and type(state.SyncStreak) == "number" and type(state.SyncStreakMax) == "number" then
+		local current = state.SyncStreak
+		local max = state.SyncStreakMax
+		local color = (current > 0 and current == max) and hud_utils.FSlateColor(0.1, 1, 0.1, 0.9) or hud_utils.FSlateColor(1, 1, 1, 0.9)
+		set("streak", string.format("%d / %d", current, max), color)
 	else
-		-- Projection hasn't started yet (first 5 seconds of the song)
-		set("proj", "—", hud_utils.FSlateColor(1, 1, 1, 0.5))
+		set("streak", "—", hud_utils.FSlateColor(1, 1, 1, 0.5))
 	end
 
 	-- 5. Hype status and flare-up indicator
