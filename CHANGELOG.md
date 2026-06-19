@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.11] - 2026-06-19
+
 ### Added
 
 - **Perfect Streak Live HUD Display**: Added a live `Streak` row to the in-game progress HUD showing the player's current sync streak (consecutive on-beat ticks >= 95% sync) against their peak sync streak for the run (e.g. `12 / 85`). Reuses already-polled sync fraction metrics for zero per-tick polling cost.
@@ -184,7 +186,8 @@ _DiscoTracker upstream history below._
 - Accuracy and Combo monitoring.
 - HighScore persistence.
 
-[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.10...HEAD
+[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.11...HEAD
+[0.4.11]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.10...v0.4.11
 [0.4.10]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.9...v0.4.10
 [0.4.9]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.8...v0.4.9
 [0.4.8]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.7...v0.4.8
