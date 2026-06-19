@@ -266,6 +266,19 @@ local function discoverStarThresholds(state)
       return
     end
   end
+
+  -- Fallback logging & debug row name extraction
+  log.info(string.format("[combat] Threshold resolution failed for %s (%s) — using default fallback thresholds.", tostring(songKey), tostring(songName)))
+  pcall(function()
+    local dt = StaticFindObject("/Game/Pagoda/Levels/Test/DT_IncursionProfiles_InfiniteDisco.DT_IncursionProfiles_InfiniteDisco")
+    if dt and dt:IsValid() then
+      local rows = {}
+      dt:ForEachRow(function(rowName, rowData)
+        table.insert(rows, tostring(rowName))
+      end)
+      log.info(string.format("[combat] Rows in DT_IncursionProfiles_InfiniteDisco: %s", table.concat(rows, ", ")))
+    end
+  end)
 end
 
 --[[ ---- running accumulation (folds a snapshot into the session state) ----
