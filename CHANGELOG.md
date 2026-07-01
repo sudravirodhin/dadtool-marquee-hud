@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Stale Music Subsystem References**: Resolved a bug where transitioning maps or loading new songs could cause the mod to read from stale, inactive `PagodaMusicSubsystem` instances. The subsystem queries are now world-aware and dynamically matching the active world.
+- **HUD/Lyrics Missing or Invisible**: Fixed a bug where both the stats panel and the lyrics bar would fail to show up or update after certain transitions (such as playing songs with special UTF-8 names).
+- **Text Library Crashes**: Added dynamic validation of the cached KismetTextLibrary CDO pointer to prevent stale pointer exceptions.
+- **Clean Widget Re-creations**: Ensured that the three main HUD modules (`in_game_progress_hud`, `lyrics_hud`, and `status_indicator_hud`) call `Destroy` before creation to prevent UObject leaks and `FName` collision conflicts.
+- **Robust UTF-8 File I/O**: Upgraded file operations in `history_handler.lua` and `lyrics_store.lua` to binary modes (`rb`/`wb`) to safeguard against encoding translation or Ctrl-Z EOF truncation on Windows.
+
 ## [0.4.12] - 2026-06-19
 
 ### Fixed
