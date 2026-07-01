@@ -77,18 +77,14 @@ local function ensureBadge()
 	end
 end
 
+local _musicSubsys = nil
 local function isSongPaused()
 	local ok, paused = pcall(function()
-		local insts = FindAllOf("PagodaMusicSubsystem")
-		if not insts then return false end
-		local world = UEHelpers.GetWorld()
-		for _, s in ipairs(insts) do
-			if s and is_indexable(s) and s:IsValid() and s:GetWorld() == world then
-				return s:IsSongPaused() == true
-			end
+		if not _musicSubsys or not _musicSubsys:IsValid() then
+			local insts = FindAllOf("PagodaMusicSubsystem")
+			_musicSubsys = insts and insts[1]
 		end
-		local s = insts[1]
-		return s and is_indexable(s) and s:IsSongPaused() == true
+		return _musicSubsys and _musicSubsys:IsSongPaused() == true
 	end)
 	return ok and paused == true
 end

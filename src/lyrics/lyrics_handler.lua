@@ -67,25 +67,8 @@ end
 
 
 local function getSubsys()
-  if M._subsys then
-    local ok, match = pcall(function()
-      return is_indexable(M._subsys) and M._subsys:IsValid() and M._subsys:GetWorld() == UEHelpers.GetWorld()
-    end)
-    if ok and match then return M._subsys end
-  end
+  if M._subsys and M._subsys:IsValid() then return M._subsys end
   local insts = FindAllOf("PagodaMusicSubsystem")
-  if insts then
-    local world = UEHelpers.GetWorld()
-    for _, s in ipairs(insts) do
-      local ok, match = pcall(function()
-        return is_indexable(s) and s:IsValid() and s:GetWorld() == world
-      end)
-      if ok and match then
-        M._subsys = s
-        return M._subsys
-      end
-    end
-  end
   M._subsys = (insts and insts[1]) or nil
   return M._subsys
 end

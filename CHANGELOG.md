@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Framerate Chugging / Performance Optimization**: Replaced heavy world-matching subsystem checks (which ran expensive FindAllOf loops and userdata comparisons on high-frequency ticks, e.g. every 60ms) with lightweight cached checks.
+- **HUD Pause Check Optimization**: Cached the subsystem reference inside `isSongPaused()` to completely avoid `FindAllOf` calls on the 400ms HUD loop heartbeat.
+
 ## [0.4.13] - 2026-07-01
 
 ### Fixed
