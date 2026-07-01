@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Score Comparison in Performance Report**: Added a `Score` display line at the top of the Results screen's left column showing the final score alongside the cached personal best (PB) score for side-by-side comparison (e.g. `Score: 124,530 (PB: 120,400)`).
+
+### Optimized
+
+- **Instant HUD Response (100ms Update Rate)**: Lowered the HUD update interval (`HUD_UPDATE_INTERVAL_MS`) from 400ms to 100ms. Since the subsystem resolution and indexability checks are now cached and allocation-free, this provides real-time, lag-free HUD metric updates with zero impact on game performance.
+
 ## [0.4.15] - 2026-07-01
 
 ### Changed

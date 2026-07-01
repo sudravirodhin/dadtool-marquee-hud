@@ -1,14 +1,14 @@
 local cfg = {}
 
 -- ~version (bump MARQUEE_VERSION on releases; UE4SS_VERSION updated when the loader is swapped)
-cfg.MARQUEE_VERSION = "0.4.15"
+cfg.MARQUEE_VERSION = "0.4.16"
 cfg.UE4SS_VERSION = "4.0.0-rc1-custom"
 
 -- ~log
 cfg.LOG_LEVEL = "debug"
 
 -- ~timing
-cfg.HUD_UPDATE_INTERVAL_MS = 400
+cfg.HUD_UPDATE_INTERVAL_MS = 100
 
 --[[
     ============ ~hud cfg ============

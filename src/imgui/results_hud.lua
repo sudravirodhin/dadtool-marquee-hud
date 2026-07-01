@@ -51,6 +51,20 @@ end
 local function renderLeftColumn(container, s)
 	local box = umg_factory.CreateVerticalBox(container, "LeftVBox")
 
+	local currentScore = s.TotalScore or 0
+	local pbScore = (s.CachedPB and s.CachedPB.highScore) or 0
+	local scoreText
+	if pbScore > 0 then
+		scoreText = string.format("Score: %s  (PB: %s)", hud_utils.Commafy(currentScore), hud_utils.Commafy(pbScore))
+	else
+		scoreText = string.format("Score: %s", hud_utils.Commafy(currentScore))
+	end
+
+	umg_factory.CreateTextBlock(box, "ScoreLine", {
+		size = 18, text = scoreText,
+		color = hud_utils.FSlateColor(0.2, 0.9, 1, 1),
+	})
+
 	umg_factory.CreateTextBlock(box, "ComboLine", {
 		size = 16, text = string.format("Max Combo: %d", s.MaxCombo or 0),
 		color = hud_utils.FSlateColor(1, 1, 1, 1),
