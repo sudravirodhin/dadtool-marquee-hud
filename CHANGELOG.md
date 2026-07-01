@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.20] - 2026-07-01
+
 ### Fixed
 
 - **Subsystem Cache Stale Delays (Instant Transitions)**: Added a cache-clearing listener on song starts and level end-plays. When maps transition, stale `PagodaMusicSubsystem` handles are immediately dropped and re-fetched on the next tick, removing the 30-60 second lag/delay where the HUD waited for UE4's garbage collector to destroy the old map's subsystem instance.
@@ -253,7 +255,8 @@ _DiscoTracker upstream history below._
 - Accuracy and Combo monitoring.
 - HighScore persistence.
 
-[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.19...HEAD
+[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.20...HEAD
+[0.4.20]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.19...v0.4.20
 [0.4.19]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.18...v0.4.19
 [0.4.18]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.17...v0.4.18
 [0.4.17]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.16...v0.4.17
