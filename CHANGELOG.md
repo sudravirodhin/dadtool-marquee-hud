@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.13] - 2026-07-01
+
 ### Fixed
 
 - **Stale Music Subsystem References**: Resolved a bug where transitioning maps or loading new songs could cause the mod to read from stale, inactive `PagodaMusicSubsystem` instances. The subsystem queries are now world-aware and dynamically matching the active world.
@@ -200,7 +202,8 @@ _DiscoTracker upstream history below._
 - Accuracy and Combo monitoring.
 - HighScore persistence.
 
-[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.12...HEAD
+[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.13...HEAD
+[0.4.13]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.12...v0.4.13
 [0.4.12]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.11...v0.4.12
 [0.4.11]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.10...v0.4.11
 [0.4.10]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.9...v0.4.10
