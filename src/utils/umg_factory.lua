@@ -22,7 +22,10 @@ local function InitCaches()
 	C.TextBlock = C.TextBlock or StaticFindObject("/Script/UMG.TextBlock")
 	C.VerticalBox = C.VerticalBox or StaticFindObject("/Script/UMG.VerticalBox")
 	C.HorizontalBox = C.HorizontalBox or StaticFindObject("/Script/UMG.HorizontalBox")
-	C.KTextLib = C.KTextLib or UEHelpers.GetKismetTextLibrary()
+	local ok, valid = pcall(function() return C.KTextLib and C.KTextLib:IsValid() end)
+	if not ok or not valid then
+		C.KTextLib = UEHelpers.GetKismetTextLibrary()
+	end
 end
 
 local function ToFText(str)

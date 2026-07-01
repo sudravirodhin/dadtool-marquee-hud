@@ -41,7 +41,7 @@ end
 
 -- Read + decode a history file, or nil if missing / empty / corrupt.
 local function _tryLoad(path)
-	local f = io.open(path, "r")
+	local f = io.open(path, "rb")
 	if not f then return nil end
 	local content = f:read("*all")
 	f:close()
@@ -74,7 +74,7 @@ function M.SaveHistory(data)
 	end
 
 	-- 1. ATOMIC WRITE: write to a temp file first
-	local f = io.open(TMP_PATH, "w")
+	local f = io.open(TMP_PATH, "wb")
 	if not f then
 		log.error("Could not open temporary history file for writing.")
 		return
@@ -89,11 +89,11 @@ function M.SaveHistory(data)
 	if success then
 		log.debug("History saved atomically successfully.")
 		-- mirror the good content to a backup so a future corrupt/interrupted main write can recover
-		local fb = io.open(BAK_PATH, "w")
+		local fb = io.open(BAK_PATH, "wb")
 		if fb then fb:write(content); fb:close() end
 	else
 		log.error("Atomic swap failed: " .. tostring(err) .. ". Executing fallback write.")
-		local f_fallback = io.open(SAVE_PATH, "w")
+		local f_fallback = io.open(SAVE_PATH, "wb")
 		if f_fallback then
 			f_fallback:write(content)
 			f_fallback:close()

@@ -12,6 +12,7 @@ M.borderWidget = nil
 M.controls = {}
 
 function M.Create()
+	M.Destroy()
 	local hud = umg_factory.CreateHUD("InGameProgressHUD")
 	if not hud then return end
 

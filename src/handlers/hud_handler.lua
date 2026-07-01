@@ -77,11 +77,17 @@ local function ensureBadge()
 	end
 end
 
--- True while the current song is paused — used to hide stats that overlap the pause menu.
 local function isSongPaused()
 	local ok, paused = pcall(function()
 		local insts = FindAllOf("PagodaMusicSubsystem")
-		local s = insts and insts[1]
+		if not insts then return false end
+		local world = UEHelpers.GetWorld()
+		for _, s in ipairs(insts) do
+			if s and is_indexable(s) and s:IsValid() and s:GetWorld() == world then
+				return s:IsSongPaused() == true
+			end
+		end
+		local s = insts[1]
 		return s and is_indexable(s) and s:IsSongPaused() == true
 	end)
 	return ok and paused == true

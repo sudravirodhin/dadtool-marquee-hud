@@ -15,7 +15,7 @@ local DIR = "./ue4ss/Mods/Marquee/Scripts/data/lyrics/"
 local CATALOG  = DIR .. "_catalog.jsonl"
 
 local function readFile(path)
-  local f = io.open(path, "r")
+  local f = io.open(path, "rb")
   if not f then return nil end
   local c = f:read("*all")
   f:close()
@@ -23,7 +23,7 @@ local function readFile(path)
 end
 
 local function exists(path)
-  local f = io.open(path, "r")
+  local f = io.open(path, "rb")
   if f then f:close(); return true end
   return false
 end
@@ -55,9 +55,10 @@ function M.LoadOffset(key)
   return tonumber(readFile(DIR .. key .. ".offset")) or 0
 end
 
+-- Save the per-song offset in binary mode
 function M.SaveOffset(key, val)
   if not key or key == "" then return end
-  local f = io.open(DIR .. key .. ".offset", "w")
+  local f = io.open(DIR .. key .. ".offset", "wb")
   if f then f:write(tostring(val)); f:close() end
 end
 
@@ -79,7 +80,7 @@ function M.WriteCatalog(entries)
       if ok then out[#out + 1] = line end
     end
   end
-  local f = io.open(CATALOG, "w")
+  local f = io.open(CATALOG, "wb")
   if not f then log.debug("[lyrics] cannot write catalog manifest: " .. CATALOG); return end
   f:write(table.concat(out, "\n"))
   if #out > 0 then f:write("\n") end

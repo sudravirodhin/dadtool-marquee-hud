@@ -16,6 +16,7 @@ M._lastCur, M._lastNext = nil, nil
 M._vis = nil   -- cached widget visibility — avoids widget:GetVisibility(), which throws on UE4SS v4.0.0
 
 function M.Create()
+  M.Destroy()
   local hud = umg_factory.CreateHUD("LyricsHUD")
   if not hud then return end
 

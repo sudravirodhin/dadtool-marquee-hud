@@ -7,6 +7,7 @@ M.statusIndicatorWidget = nil
 M.statusIndicatorValue = nil
 
 function M.Create()
+	M.Destroy()
 	local hud = umg_factory.CreateHUD("ModStatusHUD")
 	if not hud then
 		return
