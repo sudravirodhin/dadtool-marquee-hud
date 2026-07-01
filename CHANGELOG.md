@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.15] - 2026-07-01
+
 ### Changed
 
 - **Progress HUD Reordering**: Moved `Hype` row directly above `PB` and `Delta` for better metric groups.
@@ -218,7 +220,8 @@ _DiscoTracker upstream history below._
 - Accuracy and Combo monitoring.
 - HighScore persistence.
 
-[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.14...HEAD
+[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.15...HEAD
+[0.4.15]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.14...v0.4.15
 [0.4.14]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.13...v0.4.14
 [0.4.13]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.12...v0.4.13
 [0.4.12]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.11...v0.4.12
