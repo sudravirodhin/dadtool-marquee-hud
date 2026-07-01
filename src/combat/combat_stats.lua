@@ -334,4 +334,8 @@ function M.Reset(state)
   state.Bpm = nil
 end
 
+function M.ClearCache()
+  _musicSubsys = nil
+end
+
 return M

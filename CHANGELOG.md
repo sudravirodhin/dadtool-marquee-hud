@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Subsystem Cache Stale Delays (Instant Transitions)**: Added a cache-clearing listener on song starts and level end-plays. When maps transition, stale `PagodaMusicSubsystem` handles are immediately dropped and re-fetched on the next tick, removing the 30-60 second lag/delay where the HUD waited for UE4's garbage collector to destroy the old map's subsystem instance.
+
 ## [0.4.19] - 2026-07-01
 
 ### Fixed

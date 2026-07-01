@@ -77,6 +77,10 @@ local function getSubsys()
   return M._subsys
 end
 
+function M.ClearCache()
+  M._subsys = nil
+end
+
 function M.EnsureUI()
   if not lyrics_hud.IsValid() then
     lyrics_hud.Create()

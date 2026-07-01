@@ -93,6 +93,10 @@ local function isSongPaused()
 	return ok and paused == true
 end
 
+function M.ClearCache()
+	_musicSubsys = nil
+end
+
 --- Safety net (boot, ClientRestart, and each 400ms tick): recreate only the widget
 --- the CURRENT state needs — in case a map load GC'd it — and nothing else, so no
 --- widget lingers in a state that shouldn't draw it.

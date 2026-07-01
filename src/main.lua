@@ -114,9 +114,17 @@ local function CaptureSongMetadata()
 end
 _G.CaptureSongMetadata = CaptureSongMetadata
 
+local function ClearAllSubsystemCaches()
+	_musicSubsys = nil
+	pcall(function() combat_stats.ClearCache() end)
+	pcall(function() hud_handler.ClearCache() end)
+	pcall(function() lyrics_handler.ClearCache() end)
+end
+
 --[[ ============ SONG LIFECYCLE ============ --]]
 local function OnSongStart()
 	local state = _G.__SessionAggAccuracy
+	ClearAllSubsystemCaches()
 	combat_stats.Reset(state)        -- clears per-song accumulators + stale handles
 	state.__xpAwarded = false
 	CaptureSongMetadata()
@@ -152,6 +160,7 @@ local GAME_PATHS = {
 local function RegisterLifecycleHooks()
 	-- leaving a song -> back to the hub
 	RegisterHook(GAME_PATHS.PlayerController .. ":ReceiveEndPlay", function()
+		ClearAllSubsystemCaches()
 		pcall(function() hud_handler.SetState(hud_handler.States.PRE_GAME, _G.__SessionAggAccuracy) end)
 		pcall(function() lyrics_handler.OnSongEnd() end)
 	end)
