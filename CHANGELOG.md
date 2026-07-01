@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.16] - 2026-07-01
+
 ### Added
 
 - **Score Comparison in Performance Report**: Added a `Score` display line at the top of the Results screen's left column showing the final score alongside the cached personal best (PB) score for side-by-side comparison (e.g. `Score: 124,530 (PB: 120,400)`).
@@ -228,7 +230,8 @@ _DiscoTracker upstream history below._
 - Accuracy and Combo monitoring.
 - HighScore persistence.
 
-[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.15...HEAD
+[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.16...HEAD
+[0.4.16]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.15...v0.4.16
 [0.4.15]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.14...v0.4.15
 [0.4.14]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.13...v0.4.14
 [0.4.13]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.12...v0.4.13
