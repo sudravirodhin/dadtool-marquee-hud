@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.18] - 2026-07-01
+
 ### Fixed
 
 - **HUD/Lyrics Crash (Reverted PlayerTick Hook)**: Reverted the experimental `APlayerController:PlayerTick` engine hook back to the standard thread-safe `StartGameThreadLoop` architecture. `PlayerTick` is a virtual C++ engine function and not a `UFunction`, meaning UE4SS could not hook it, causing the entire HUD and lyrics update ticks to silently fail to run.
@@ -241,7 +243,8 @@ _DiscoTracker upstream history below._
 - Accuracy and Combo monitoring.
 - HighScore persistence.
 
-[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.17...HEAD
+[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.18...HEAD
+[0.4.18]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.17...v0.4.18
 [0.4.17]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.16...v0.4.17
 [0.4.16]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.15...v0.4.16
 [0.4.15]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.14...v0.4.15
