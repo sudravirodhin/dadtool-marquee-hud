@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Optimized
+
+- **Removed LoopAsync Scheduling Lag (Zero Delay Ticks)**: Replaced the asynchronous worker thread `LoopAsync` loop driver with a direct engine-driven hook on `APlayerController:PlayerTick`. This runs both HUD syncs and lyrics playhead ticks directly on the game thread with zero OS scheduling latency, preventing the UI from freezing or lagging behind until key presses wake up the VM.
+
 ## [0.4.16] - 2026-07-01
 
 ### Added

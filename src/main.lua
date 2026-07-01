@@ -212,27 +212,25 @@ LoopAsync(HEARTBEAT_MS, function()
 	return false
 end)
 
--- Safe game-thread loop helper to prevent Lua VM multi-threading data races (ltable.c crashes).
--- Uses LoopInGameThreadWithDelay if supported, falling back to LoopAsync + ExecuteInGameThread.
-local function StartGameThreadLoop(intervalMs, callback)
-	if LoopInGameThreadWithDelay then
-		LoopInGameThreadWithDelay(intervalMs, callback)
-	else
-		LoopAsync(intervalMs, function()
-			ExecuteInGameThread(callback)
-			return false
-		end)
+local lastHudUpdate = 0
+local lastLyricsUpdate = 0
+
+RegisterHook("/Script/Engine.PlayerController:PlayerTick", function(self, deltaTime)
+	local now = os.clock()
+
+	-- 1. Lyrics playhead tick (every 60ms or LYRICS_TICK_MS)
+	local lyricsInterval = (cfg.LYRICS_TICK_MS or 60) / 1000.0
+	if now - lastLyricsUpdate >= lyricsInterval then
+		lastLyricsUpdate = now
+		if lyrics_handler then pcall(lyrics_handler.Tick) end
 	end
-end
 
--- HUD sync loop: hud_handler.Sync polls the game's combat signals + renders (IN_GAME only)
-StartGameThreadLoop(cfg.HUD_UPDATE_INTERVAL_MS, function()
-	hud_handler.Sync(_G.__SessionAggAccuracy)
-end)
-
--- lyrics sync loop
-StartGameThreadLoop(cfg.LYRICS_TICK_MS or 60, function()
-	if lyrics_handler then pcall(lyrics_handler.Tick) end
+	-- 2. HUD sync loop (every 100ms or HUD_UPDATE_INTERVAL_MS)
+	local hudInterval = (cfg.HUD_UPDATE_INTERVAL_MS or 100) / 1000.0
+	if now - lastHudUpdate >= hudInterval then
+		lastHudUpdate = now
+		pcall(function() hud_handler.Sync(_G.__SessionAggAccuracy) end)
+	end
 end)
 
 
