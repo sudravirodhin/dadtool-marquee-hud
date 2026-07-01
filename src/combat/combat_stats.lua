@@ -13,12 +13,16 @@ local UEHelpers = require("UEHelpers")
 local log = require("utils.log")
 local cfg = require("config")
 
+local function call_is_valid(o)
+  return o:IsValid()
+end
+
 local function is_valid(o)
   if not o then return false end
   local t = type(o)
   if t == "table" then return true end
   if t == "userdata" then
-    local ok, res = pcall(o.IsValid, o)
+    local ok, res = pcall(call_is_valid, o)
     return not ok or res == true
   end
   return false

@@ -30,12 +30,16 @@ M.CurrentState = M.States.PRE_GAME
 local HUB_NAMES = cfg.HUB_MAP_NAMES or { "encore" }
 local _lastMapId = nil
 
+local function call_is_valid(o)
+	return o:IsValid()
+end
+
 local function is_indexable(obj)
 	if not obj then return false end
 	local t = type(obj)
 	if t == "table" then return true end
 	if t == "userdata" then
-		local ok, res = pcall(obj.IsValid, obj)
+		local ok, res = pcall(call_is_valid, obj)
 		return not ok or res == true
 	end
 	return false

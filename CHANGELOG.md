@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Indexability Check Crash**: Fixed a critical crash where resolving `obj.IsValid` inside the optimized `is_indexable` check threw an error outside of `pcall` if `obj` was a stale or null userdata wrapper. Replaced with a safe, static helper function passed directly to `pcall` to ensure all stale objects are caught gracefully without crashing the loops.
+
 ## [0.4.18] - 2026-07-01
 
 ### Fixed
