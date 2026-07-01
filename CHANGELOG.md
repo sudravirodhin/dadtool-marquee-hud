@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Live Hit-Driven Perfect Streaks**: Refactored the Perfect Streak tracking to be driven directly by the game's `WBP_CombatScore:HandleComboCountChanged` event hook. The streak now increments by exactly 1 on every on-beat perfect hit (sync >= 95%) and immediately resets to 0 on a miss, replacing the timer-based tick count.
+
+### Optimized
+
+- **Instant Event-Based HUD Updates**: Configured the HUD to update instantly upon combo changes (hits or misses), providing immediate, zero-delay visual feedback for perfect hits and combo breaks.
+
 ## [0.4.20] - 2026-07-01
 
 ### Fixed

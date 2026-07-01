@@ -155,6 +155,7 @@ local GAME_PATHS = {
 	PlayerController  = "/Game/Pagoda/Characters/Player/BP_PagodaPlayerController.BP_PagodaPlayerController_C",
 	GameMode         = "/Game/Pagoda/Core/GameModes/BP_PagodaGameMode.BP_PagodaGameMode_C",
 	LevelEnd         = "/Game/Pagoda/UI/Game/WBP_LevelEndScreen.WBP_LevelEndScreen_C",
+	CombatScore      = "/Game/Pagoda/UI/Game/CombatScore/WBP_CombatScore.WBP_CombatScore_C",
 }
 
 local function RegisterLifecycleHooks()
@@ -188,6 +189,14 @@ local function RegisterScoresHooks()
 	end)
 	RegisterHook(GAME_PATHS.LevelEnd .. ":Destruct", function()
 		pcall(function() hud_handler.HideResultsUI() end)
+	end)
+	RegisterHook(GAME_PATHS.CombatScore .. ":HandleComboCountChanged", function(wrappedSelf, wrappedCombo)
+		pcall(function()
+			local combo = wrappedCombo and wrappedCombo:get()
+			if combo then
+				combat_stats.RecordHit(_G.__SessionAggAccuracy, combo)
+			end
+		end)
 	end)
 end
 

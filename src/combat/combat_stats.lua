@@ -120,13 +120,6 @@ function M.Accumulate(state, snap)
     state.SyncSamples = (state.SyncSamples or 0) + 1
     state.SyncSum     = (state.SyncSum or 0) + f
     state.SyncPeak    = math.max(state.SyncPeak or 0, f)
-    -- "perfect streak": consecutive ticks at/near full sync (>= 0.95)
-    if f >= 0.95 then
-      state.SyncStreak    = (state.SyncStreak or 0) + 1
-      state.SyncStreakMax = math.max(state.SyncStreakMax or 0, state.SyncStreak)
-    else
-      state.SyncStreak = 0
-    end
   end
   if type(snap.score) == "number" then state.TotalScore = snap.score end
   if type(snap.mult)  == "number" then state.Multiplier = snap.mult end
@@ -336,6 +329,31 @@ end
 
 function M.ClearCache()
   _musicSubsys = nil
+end
+
+function M.RecordHit(state, combo)
+  if not state then return end
+  local prevCombo = state.Combo or 0
+  state.Combo = combo
+
+  if combo == 0 or combo < prevCombo then
+    state.SyncStreak = 0
+    pcall(function() require("imgui.in_game_progress_hud").Update(state, M.Poll()) end)
+    return
+  end
+
+  local snap = M.Poll()
+  if not snap then return end
+  local f = M.SyncFraction(snap)
+  if f then
+    if f >= 0.95 then
+      state.SyncStreak = (state.SyncStreak or 0) + 1
+      state.SyncStreakMax = math.max(state.SyncStreakMax or 0, state.SyncStreak)
+    else
+      state.SyncStreak = 0
+    end
+    pcall(function() require("imgui.in_game_progress_hud").Update(state, snap) end)
+  end
 end
 
 return M
