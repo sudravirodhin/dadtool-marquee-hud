@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **Progress HUD Reordering**: Moved `Hype` row directly above `PB` and `Delta` for better metric groups.
+- **Streak Value Format**: Updated sync streak text format from `X / Y` to `X (max Y)` to make it clear that Y is a personal best peak value rather than a target total.
+
+### Optimized
+
+- **Reduced Lua VM Allocations**: Replaced local wrapper closure creation inside `is_indexable()`/`is_valid()` with direct `pcall(obj.IsValid, obj)` calls, saving memory allocation churn and preventing garbage collection frame-hiccups.
+
 ## [0.4.14] - 2026-07-01
 
 ### Fixed

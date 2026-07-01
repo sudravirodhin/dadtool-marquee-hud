@@ -18,7 +18,7 @@ local function is_valid(o)
   local t = type(o)
   if t == "table" then return true end
   if t == "userdata" then
-    local ok, res = pcall(function() return o:IsValid() end)
+    local ok, res = pcall(o.IsValid, o)
     return not ok or res == true
   end
   return false

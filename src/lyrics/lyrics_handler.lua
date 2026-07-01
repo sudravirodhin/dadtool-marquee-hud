@@ -48,7 +48,7 @@ local function is_indexable(obj)
   local t = type(obj)
   if t == "table" then return true end
   if t == "userdata" then
-    local ok, res = pcall(function() return obj:IsValid() end)
+    local ok, res = pcall(obj.IsValid, obj)
     return not ok or res == true
   end
   return false

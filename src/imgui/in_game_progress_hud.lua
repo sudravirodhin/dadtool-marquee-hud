@@ -36,9 +36,9 @@ function M.Create()
 	row("BPM   ", "bpm")
 	row("Sync  ", "sync", hud_utils.SyncColor(1))
 	row("Streak", "streak")
+	row("Hype  ", "hype")
 	row("PB    ", "pb")
 	row("Delta ", "pb_delta")
-	row("Hype  ", "hype")
 
 	umg_factory.ApplyAlignment(canvas, border, cfg.HUD_MAIN_ALLIGNMENT or "topright",
 		{ X = cfg.HUD_POS_X or -25, Y = cfg.HUD_POS_Y or 95 })
@@ -85,7 +85,7 @@ function M.Update(state, snap)
 		local current = state.SyncStreak
 		local max = state.SyncStreakMax
 		local color = (current > 0 and current == max) and hud_utils.FSlateColor(0.1, 1, 0.1, 0.9) or hud_utils.FSlateColor(1, 1, 1, 0.9)
-		set("streak", string.format("%d / %d", current, max), color)
+		set("streak", string.format("%d (max %d)", current, max), color)
 	else
 		set("streak", "—", hud_utils.FSlateColor(1, 1, 1, 0.5))
 	end
