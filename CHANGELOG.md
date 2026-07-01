@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.21] - 2026-07-01
+
 ### Added
 
 - **Live Hit-Driven Perfect Streaks**: Refactored the Perfect Streak tracking to be driven directly by the game's `WBP_CombatScore:HandleComboCountChanged` event hook. The streak now increments by exactly 1 on every on-beat perfect hit (sync >= 95%) and immediately resets to 0 on a miss, replacing the timer-based tick count.
@@ -263,7 +265,8 @@ _DiscoTracker upstream history below._
 - Accuracy and Combo monitoring.
 - HighScore persistence.
 
-[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.20...HEAD
+[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.21...HEAD
+[0.4.21]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.20...v0.4.21
 [0.4.20]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.19...v0.4.20
 [0.4.19]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.18...v0.4.19
 [0.4.18]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.17...v0.4.18
