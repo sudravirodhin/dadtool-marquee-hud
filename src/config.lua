@@ -1,7 +1,7 @@
 local cfg = {}
 
 -- ~version (bump MARQUEE_VERSION on releases; UE4SS_VERSION updated when the loader is swapped)
-cfg.MARQUEE_VERSION = "0.4.17"
+cfg.MARQUEE_VERSION = "0.4.18"
 cfg.UE4SS_VERSION = "4.0.0-rc1-custom"
 
 -- ~log

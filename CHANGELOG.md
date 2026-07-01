@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **HUD/Lyrics Crash (Reverted PlayerTick Hook)**: Reverted the experimental `APlayerController:PlayerTick` engine hook back to the standard thread-safe `StartGameThreadLoop` architecture. `PlayerTick` is a virtual C++ engine function and not a `UFunction`, meaning UE4SS could not hook it, causing the entire HUD and lyrics update ticks to silently fail to run.
+- **Fixed Lag and Kept 100ms Response**: Maintained the optimized cache validation, local subsystem caching, and closure allocation savings, which completely resolves the original lag/delay issue when running on the standard `StartGameThreadLoop`.
+
 ## [0.4.17] - 2026-07-01
 
 ### Optimized
