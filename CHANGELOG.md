@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.19] - 2026-07-01
+
 ### Fixed
 
 - **Indexability Check Crash**: Fixed a critical crash where resolving `obj.IsValid` inside the optimized `is_indexable` check threw an error outside of `pcall` if `obj` was a stale or null userdata wrapper. Replaced with a safe, static helper function passed directly to `pcall` to ensure all stale objects are caught gracefully without crashing the loops.
@@ -247,7 +249,8 @@ _DiscoTracker upstream history below._
 - Accuracy and Combo monitoring.
 - HighScore persistence.
 
-[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.18...HEAD
+[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.19...HEAD
+[0.4.19]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.18...v0.4.19
 [0.4.18]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.17...v0.4.18
 [0.4.17]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.16...v0.4.17
 [0.4.16]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.15...v0.4.16
