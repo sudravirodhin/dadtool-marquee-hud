@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.17] - 2026-07-01
+
 ### Optimized
 
 - **Removed LoopAsync Scheduling Lag (Zero Delay Ticks)**: Replaced the asynchronous worker thread `LoopAsync` loop driver with a direct engine-driven hook on `APlayerController:PlayerTick`. This runs both HUD syncs and lyrics playhead ticks directly on the game thread with zero OS scheduling latency, preventing the UI from freezing or lagging behind until key presses wake up the VM.
@@ -234,7 +236,8 @@ _DiscoTracker upstream history below._
 - Accuracy and Combo monitoring.
 - HighScore persistence.
 
-[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.16...HEAD
+[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.17...HEAD
+[0.4.17]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.16...v0.4.17
 [0.4.16]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.15...v0.4.16
 [0.4.15]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.14...v0.4.15
 [0.4.14]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.13...v0.4.14
