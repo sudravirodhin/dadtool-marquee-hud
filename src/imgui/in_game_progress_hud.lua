@@ -49,35 +49,60 @@ function M.Create()
 	M.progressWidget = hud
 end
 
+local function call_set_text(textBlock, fText)
+	textBlock:SetText(fText)
+end
+
+local function call_set_color(textBlock, color)
+	textBlock:SetColorAndOpacity(color)
+end
+
+local function call_set_brush_color(border, color)
+	border:SetBrushColor(color)
+end
+
+local function call_remove_from_parent(widget)
+	widget:RemoveFromParent()
+end
+
+local function call_set_visibility(widget, vis)
+	widget:SetVisibility(vis)
+end
+
+local function call_is_in_viewport(widget)
+	return widget:IsInViewport()
+end
+
+local function set_widget_val(key, text, color)
+	local c = M.controls[key]
+	if c and c:IsValid() then
+		local fText = umg_factory.ToFText(text)
+		pcall(call_set_text, c, fText)
+		if color then
+			pcall(call_set_color, c, color)
+		end
+	end
+end
+
 function M.Update(state, snap)
 	if not M.progressWidget or not M.progressWidget:IsValid() then return end
 	if not M.controls then return end
 	snap = snap or {}
 
-	local function set(key, text, color)
-		local c = M.controls[key]
-		if c and c:IsValid() then
-			pcall(function()
-				c:SetText(umg_factory.ToFText(text))
-				if color then c:SetColorAndOpacity(color) end
-			end)
-		end
-	end
-
 	local frac = combat_stats.SyncFraction(snap)
 
 	-- 1. Song BPM (Tempo)
 	if state and type(state.Bpm) == "number" and state.Bpm > 0 then
-		set("bpm", string.format("%d", math.floor(state.Bpm + 0.5)))
+		set_widget_val("bpm", string.format("%d", math.floor(state.Bpm + 0.5)))
 	else
-		set("bpm", "—", hud_utils.FSlateColor(1, 1, 1, 0.5))
+		set_widget_val("bpm", "—", hud_utils.FSlateColor(1, 1, 1, 0.5))
 	end
 
 	-- 2. Live sync %
 	if frac then
-		set("sync", string.format("%d%%", math.floor(frac * 100 + 0.5)), hud_utils.SyncColor(frac))
+		set_widget_val("sync", string.format("%d%%", math.floor(frac * 100 + 0.5)), hud_utils.SyncColor(frac))
 	else
-		set("sync", "—")
+		set_widget_val("sync", "—")
 	end
 
 	-- 3. Perfect Streak (Sync Streak)
@@ -85,16 +110,16 @@ function M.Update(state, snap)
 		local current = state.SyncStreak
 		local max = state.SyncStreakMax
 		local color = (current > 0 and current == max) and hud_utils.FSlateColor(0.1, 1, 0.1, 0.9) or hud_utils.FSlateColor(1, 1, 1, 0.9)
-		set("streak", string.format("%d (max %d)", current, max), color)
+		set_widget_val("streak", string.format("%d (max %d)", current, max), color)
 	else
-		set("streak", "—", hud_utils.FSlateColor(1, 1, 1, 0.5))
+		set_widget_val("streak", "—", hud_utils.FSlateColor(1, 1, 1, 0.5))
 	end
 
 	-- 4. PB to beat
 	if state and state.CachedPB and state.CachedPB.highScore and state.CachedPB.highScore > 0 then
-		set("pb", hud_utils.Abbrev(state.CachedPB.highScore))
+		set_widget_val("pb", hud_utils.Abbrev(state.CachedPB.highScore))
 	else
-		set("pb", "—")
+		set_widget_val("pb", "—")
 	end
 
 	-- 5. Live PB Delta (ghost tracker)
@@ -102,40 +127,31 @@ function M.Update(state, snap)
 		local d = state.PbDelta
 		local prefix = d >= 0 and "+" or ""
 		local color = d >= 0 and hud_utils.FSlateColor(0.1, 1, 0.1, 0.9) or hud_utils.FSlateColor(1, 0.2, 0.2, 0.9)
-		set("pb_delta", string.format("%s%s", prefix, hud_utils.Commafy(math.floor(d + 0.5))), color)
+		set_widget_val("pb_delta", string.format("%s%s", prefix, hud_utils.Commafy(math.floor(d + 0.5))), color)
 	else
-		set("pb_delta", "—", hud_utils.FSlateColor(1, 1, 1, 0.5))
+		set_widget_val("pb_delta", "—", hud_utils.FSlateColor(1, 1, 1, 0.5))
 	end
 
 	-- 6. Hype status and flare-up indicator
 	if state and state.HypeStatus then
 		local is_on_fire = (state.HypeStatus == "ON FIRE")
 		local color = is_on_fire and hud_utils.FSlateColor(1, 0.5, 0, 1) or hud_utils.FSlateColor(1, 1, 1, 0.5)
-		set("hype", state.HypeStatus, color)
+		set_widget_val("hype", state.HypeStatus, color)
 
 		-- Flare up the border brush color
 		if M.borderWidget and M.borderWidget:IsValid() then
-			pcall(function()
-				if is_on_fire then
-					-- Glowing orange/gold background
-					M.borderWidget:SetBrushColor(hud_utils.FLinearColor(1, 0.5, 0, 0.6))
-				else
-					-- Standard semi-transparent black background
-					M.borderWidget:SetBrushColor(hud_utils.FLinearColor(0, 0, 0, 0.2))
-				end
-			end)
+			local bColor = is_on_fire and hud_utils.FLinearColor(1, 0.5, 0, 0.6) or hud_utils.FLinearColor(0, 0, 0, 0.2)
+			pcall(call_set_brush_color, M.borderWidget, bColor)
 		end
 	else
-		set("hype", "—", hud_utils.FSlateColor(1, 1, 1, 0.5))
+		set_widget_val("hype", "—", hud_utils.FSlateColor(1, 1, 1, 0.5))
 	end
 end
 
 -- Remove the stats panel from the viewport entirely (used when leaving gameplay).
 function M.Destroy()
 	if M.progressWidget then
-		pcall(function()
-			if M.progressWidget:IsValid() then M.progressWidget:RemoveFromParent() end
-		end)
+		pcall(call_remove_from_parent, M.progressWidget)
 	end
 	M.progressWidget = nil
 	M.borderWidget = nil
@@ -146,7 +162,7 @@ end
 function M.SetVisibility(visibility)
 	if not M.progressWidget or not M.progressWidget:IsValid() then return end
 	if M._cachedVisibility == visibility then return end
-	pcall(function() M.progressWidget:SetVisibility(visibility) end)
+	pcall(call_set_visibility, M.progressWidget, visibility)
 	M._cachedVisibility = visibility
 end
 
@@ -164,7 +180,7 @@ end
 function M.IsValid()
 	local isValid = M.progressWidget and M.progressWidget:IsValid()
 	if isValid then
-		local ok, inView = pcall(function() return M.progressWidget:IsInViewport() end)
+		local ok, inView = pcall(call_is_in_viewport, M.progressWidget)
 		if ok and not inView then return false end
 	end
 	return isValid

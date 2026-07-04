@@ -44,8 +44,9 @@ function M.Create()
     outline = { size = 1, color = hud_utils.FLinearColor(0, 0, 0, 1) },
   })
   -- center each line within the bar (ETextJustify::Center = 1)
-  pcall(function() cur:SetJustification(1) end)
-  pcall(function() nxt:SetJustification(1) end)
+  local function call_set_justification(tb, j) tb:SetJustification(j) end
+  pcall(call_set_justification, cur, 1)
+  pcall(call_set_justification, nxt, 1)
 
   M.curText, M.nextText = cur, nxt
   umg_factory.ApplyAlignment(canvas, border, cfg.LYRICS_ALIGNMENT or "bottom",
@@ -57,6 +58,30 @@ function M.Create()
   M.widget = hud
 end
 
+local function call_set_visibility(w, vis)
+  w:SetVisibility(vis)
+end
+
+local function call_set_visibility_prop(w, vis)
+  w.Visibility = vis
+end
+
+local function call_remove_from_parent(w)
+  w:RemoveFromParent()
+end
+
+local function call_set_text(tb, fText)
+  tb:SetText(fText)
+end
+
+local function call_set_render_opacity(w, opacity)
+  w:SetRenderOpacity(opacity)
+end
+
+local function call_is_in_viewport(w)
+  return w:IsInViewport()
+end
+
 function M.SetVisibility(v)
   if not M.widget or not M.widget:IsValid() then return end
   -- Track visibility in Lua instead of calling widget:GetVisibility(). On UE4SS v4.0.0
@@ -65,8 +90,8 @@ function M.SetVisibility(v)
   -- — the property is what the other HUDs use and it renders correctly on v4.0.0.
   if M._vis == v then return end
   M._vis = v
-  pcall(function() M.widget:SetVisibility(v) end)
-  pcall(function() M.widget.Visibility = v end)
+  pcall(call_set_visibility, M.widget, v)
+  pcall(call_set_visibility_prop, M.widget, v)
 end
 
 function M.Hide()
@@ -77,9 +102,7 @@ end
 -- song has no lyrics) so nothing lingers/draws when there's nothing to show.
 function M.Destroy()
   if M.widget then
-    pcall(function()
-      if M.widget:IsValid() then M.widget:RemoveFromParent() end
-    end)
+    pcall(call_remove_from_parent, M.widget)
   end
   M.widget = nil
   M.curText = nil
@@ -90,6 +113,20 @@ end
 function M.SetActive(on)
   M._active = on and true or false
   if not M._active then M.Hide() end
+end
+
+local function update_cur_text(cur)
+  if M.curText:IsValid() then
+    M.curText:SetText(umg_factory.ToFText(cur))
+    M.curText:SetVisibility(hud_utils.Visibility.VISIBLE)
+  end
+end
+
+local function update_next_text(nxt)
+  if M.nextText:IsValid() then
+    M.nextText:SetText(umg_factory.ToFText(nxt))
+    M.nextText:SetVisibility((nxt ~= "") and hud_utils.Visibility.VISIBLE or hud_utils.Visibility.COLLAPSED)
+  end
 end
 
 function M.Update(currentText, nextText)
@@ -106,22 +143,11 @@ function M.Update(currentText, nextText)
 
   local nxt = nextText or ""
   if cur ~= M._lastCur then
-    pcall(function()
-      if M.curText:IsValid() then   -- re-validate the instant before touching UMG
-        M.curText:SetText(umg_factory.ToFText(cur))
-        M.curText:SetVisibility(hud_utils.Visibility.VISIBLE)
-      end
-    end)
+    pcall(update_cur_text, cur)
     M._lastCur = cur
   end
   if nxt ~= M._lastNext then
-    pcall(function()
-      if M.nextText:IsValid() then
-        M.nextText:SetText(umg_factory.ToFText(nxt))
-        -- collapse the preview row when empty so the bar doesn't grow a blank line
-        M.nextText:SetVisibility((nxt ~= "") and hud_utils.Visibility.VISIBLE or hud_utils.Visibility.COLLAPSED)
-      end
-    end)
+    pcall(update_next_text, nxt)
     M._lastNext = nxt
   end
   M.SetVisibility(hud_utils.Visibility.HITTESTINVISIBLE)
@@ -129,7 +155,17 @@ end
 
 function M.SetOpacity(alpha)
   if not M.widget or not M.widget:IsValid() then return end
-  pcall(function() M.widget:SetRenderOpacity(alpha) end)
+  pcall(call_set_render_opacity, M.widget, alpha)
+end
+
+local function show_notice_cur(text)
+  M.curText:SetText(umg_factory.ToFText(text or ""))
+  M.curText:SetVisibility(hud_utils.Visibility.VISIBLE)
+end
+
+local function show_notice_next()
+  M.nextText:SetText(umg_factory.ToFText(""))
+  M.nextText:SetVisibility(hud_utils.Visibility.COLLAPSED)
 end
 
 -- Show a transient message on the bar (e.g. "lyrics not found"); the fade is driven
@@ -138,10 +174,8 @@ function M.ShowNotice(text)
   if not M.widget or not M.widget:IsValid() then return end
   if not (M.curText and M.nextText) then return end
   M.SetOpacity(1)
-  pcall(function() M.curText:SetText(umg_factory.ToFText(text or "")) end)
-  pcall(function() M.curText:SetVisibility(hud_utils.Visibility.VISIBLE) end)
-  pcall(function() M.nextText:SetText(umg_factory.ToFText("")) end)
-  pcall(function() M.nextText:SetVisibility(hud_utils.Visibility.COLLAPSED) end)  -- single-line notice
+  pcall(show_notice_cur, text)
+  pcall(show_notice_next)
   M._lastCur, M._lastNext = nil, nil
   M.SetVisibility(hud_utils.Visibility.HITTESTINVISIBLE)
 end
@@ -149,7 +183,7 @@ end
 function M.IsValid()
   local ok = M.widget and M.widget:IsValid()
   if ok then
-    local okk, inView = pcall(function() return M.widget:IsInViewport() end)
+    local okk, inView = pcall(call_is_in_viewport, M.widget)
     if okk and not inView then return false end
   end
   return ok

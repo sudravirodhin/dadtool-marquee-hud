@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Optimized
+
+- **Zero-Allocation Heartbeat & Lyrics Tickers**: Replaced inline closures inside the high-frequency tickers (`in_game_progress_hud` and `lyrics_hud` tick paths) with static, pre-allocated function delegates. This completely eliminates garbage collection memory churn during gameplay, resolving micro-stuttering and visual drag.
+
 ## [0.4.21] - 2026-07-01
 
 ### Added

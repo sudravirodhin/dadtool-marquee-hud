@@ -47,6 +47,14 @@ local function call_is_valid(o)
   return o:IsValid()
 end
 
+local function call_is_song_playing(subsys)
+  return subsys:IsSongPlaying()
+end
+
+local function call_get_timeline_position(subsys)
+  return subsys:GetTimelinePosition()
+end
+
 local function is_indexable(obj)
   if not obj then return false end
   local t = type(obj)
@@ -245,11 +253,10 @@ function M.Tick()
   --   marker == a stage    -> crash WAS in lyrics, at that exact call (+ time/line)
 
   -- Only touch the playhead while the song is actually PLAYING (count-in not ready).
-  local playing = false
-  pcall(function() playing = (subsys:IsSongPlaying() == true) end)
-  if not playing then return end
+  local playingOk, playing = pcall(call_is_song_playing, subsys)
+  if not playingOk or not playing then return end
 
-  local ok, pos = pcall(function() return subsys:GetTimelinePosition() end)
+  local ok, pos = pcall(call_get_timeline_position, subsys)
   if not ok or type(pos) ~= "number" then return end
   pos = pos + (cfg.LYRICS_OFFSET_SEC or 0) + (M._songOffset or 0)
 
