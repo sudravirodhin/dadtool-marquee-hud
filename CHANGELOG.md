@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Native Access Violation on UGC Challenge Check**: Fixed a critical native game crash (Access Violation `0xc0000005` in `FField::GetClass()`) when loading into Infinite Disco/Challenges with `LYRICS_DISABLE_ON_CHALLENGES` enabled. The crash was caused by unsafe `GetOuter()` and `GetClass()` calls on a stale/destructed `CurrentChallenge` object. Simplified the check to match by `CurrentChallenge:GetFName():ToString()` only, and resolved a configuration migration bug by defaulting the condition check to `== true` instead of `~= false`.
+
 ## [0.4.27] - 2026-07-04
 
 ### Removed

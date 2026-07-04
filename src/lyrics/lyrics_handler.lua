@@ -116,7 +116,7 @@ function M.OnSongStart(state)
   M._songOffset = store.LoadOffset(info.key)   -- per-song manual sync correction
 
   -- Skip lyrics completely on challenge / infinite maps to prevent timing drift issues
-  if cfg.LYRICS_DISABLE_ON_CHALLENGES ~= false then
+  if cfg.LYRICS_DISABLE_ON_CHALLENGES == true then
     local isChallenge = false
     local map = getMapId()
     if map then
@@ -140,13 +140,11 @@ function M.OnSongStart(state)
           local cc = comp.CurrentChallenge
           if cc and cc:IsValid() then
             local name = cc:GetFName():ToString()
-            local outer = cc:GetOuter()
-            local outerClass = (outer and outer:IsValid() and outer:GetClass():GetFName():ToString()) or ""
-            -- Default Free Play (standard Infinite Disco) has name == "DA_Challenge_" and outerClass == "BP_PagodaChallengeData_C"
-            -- Real/UGC challenges have outerClass == "Package" and custom names.
-            if outerClass == "Package" or name ~= "DA_Challenge_" then
+            -- Default Free Play (standard Infinite Disco) has name == "DA_Challenge_"
+            -- Custom/premade/UGC challenges have custom names.
+            if name ~= "DA_Challenge_" then
               isChallenge = true
-              log.debug(string.format("[lyrics] active challenge detected via object checks: name=%s outerClass=%s", name, outerClass))
+              log.debug(string.format("[lyrics] active challenge detected via name check: name=%s", name))
             end
           end
         end
