@@ -35,6 +35,12 @@ local function ToFText(str)
 	return C.KTextLib:Conv_StringToText(str)
 end
 
+local _objCounter = 0
+local function genUniqueName(prefix)
+	_objCounter = _objCounter + 1
+	return FName((prefix or "Obj") .. "_" .. _objCounter)
+end
+
 function M.CreateHUD(name)
 	InitCaches()
 	local gi = UEHelpers.GetGameInstance()
@@ -42,19 +48,19 @@ function M.CreateHUD(name)
 		return nil
 	end
 
-	local hud = StaticConstructObject(C.UserWidget, gi, FName())
-	hud.WidgetTree = StaticConstructObject(C.WidgetTree, hud, FName())
+	local hud = StaticConstructObject(C.UserWidget, gi, genUniqueName(name))
+	hud.WidgetTree = StaticConstructObject(C.WidgetTree, hud, genUniqueName(name .. "_Tree"))
 	return hud
 end
 
 function M.CreateCanvas(tree, name)
-	local canvas = StaticConstructObject(C.CanvasPanel, tree, FName())
+	local canvas = StaticConstructObject(C.CanvasPanel, tree, genUniqueName(name))
 	tree.RootWidget = canvas
 	return canvas
 end
 
 function M.CreateVerticalBox(parent, name)
-	local box = StaticConstructObject(C.VerticalBox, parent, FName())
+	local box = StaticConstructObject(C.VerticalBox, parent, genUniqueName(name))
 	if box and box:IsValid() and parent.AddChild then
 		parent:AddChild(box)
 	end
@@ -62,7 +68,7 @@ function M.CreateVerticalBox(parent, name)
 end
 
 function M.CreateHorizontalBox(parent, name)
-	local box = StaticConstructObject(C.HorizontalBox, parent, FName())
+	local box = StaticConstructObject(C.HorizontalBox, parent, genUniqueName(name))
 	if box and box:IsValid() and parent.AddChild then
 		parent:AddChild(box)
 	end
@@ -76,7 +82,7 @@ function M.CreateTextBlock(parent, name, params)
 	if params.outline == nil then
 		params.outline = { size = 1, color = helpers.FLinearColor(0, 0, 0, 1) }
 	end
-	local tb = StaticConstructObject(C.TextBlock, parent, FName())
+	local tb = StaticConstructObject(C.TextBlock, parent, genUniqueName(name))
 	if tb and tb:IsValid() then
 		tb.Font.Size = params.size or 10
 		tb.Font.SkewAmount = params.skew or 0
@@ -115,7 +121,7 @@ end
 
 function M.CreateBorder(parent, name, params)
 	params = params or {}
-	local border = StaticConstructObject(C.Border, parent, FName())
+	local border = StaticConstructObject(C.Border, parent, genUniqueName(name))
 	if border and border:IsValid() then
 		border:SetBrushColor(params.brushColor or helpers.FLinearColor(0, 0, 0, 0.2))
 		border:SetPadding(params.padding or { Left = 20, Top = 10, Right = 20, Bottom = 10 })

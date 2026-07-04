@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **UE4SS FName Argument Overload Crash**: Fixed a critical crash where parameterless `FName()` constructor calls failed due to lack of a 0-argument constructor overload in this UE4SS release (resulting in `No overload found for function 'FName'`). Implemented `genUniqueName(prefix)` which generates unique string-based FNames dynamically using an auto-incremented counter, preventing construct errors and restoring HUD drawing.
+
 ## [0.4.23] - 2026-07-04
 
 ### Fixed
