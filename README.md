@@ -7,7 +7,7 @@
 > **AI Assistance Disclosure & Disclaimer**
 > This project was developed with the assistance of an AI Large Language Model (LLM). It is a purely personal, non-profit project built for fun to speed up development and make it easier to enjoy the game. If you are not comfortable using software that has been touched or written with the help of AI, please do not proceed.
 
-**Marquee** adds a karaoke-style synced-lyrics bar, performance tracking built on the game's *own* scoring (Score / Combo / Sync / Stars), session leveling, a post-song report, and a Career Stats panel to *Dead as Disco*.
+**Marquee** adds a karaoke-style synced-lyrics bar, a live progress HUD tracking BPM and PB Delta, session leveling, a post-song report, and a Career Stats panel to *Dead as Disco*.
 
 It is a fork of **[DiscoTracker](https://github.com/lucashort7/dad-performance-tracker)** by *hort (lucashort7)*, rebuilt around two ideas: read the game's real combat tallies instead of inventing hit-accuracy, and put the lyrics on screen.
 
@@ -16,11 +16,11 @@ It is a fork of **[DiscoTracker](https://github.com/lucashort7/dad-performance-t
 ## Features
 
 - **Synced lyrics** — a karaoke bar that scrolls in time with the music, reading the game's playhead so it stays drift-free through pauses and restarts. Per-song timing nudge saved to disk.
-- **DaD-native tracking** — *polls* the game's own combat tallies (Score, Max Combo, Music Sync meter, score multiplier, Stars) rather than hooking individual moves. No invented accuracy — it's the game's model.
-- **Post-song report** — a score-share breakdown (which moves earned what, as a % of the run plus compact totals), Stars earned, sync avg/peak, and a level-up hero panel.
-- **Leveling** — sync-weighted XP, levels, and titles that persist across sessions.
+- **DaD-native tracking** — *polls* the game's own combat tallies (Score, Max Combo, score multiplier, Stars) rather than hooking individual moves. No invented accuracy — it's the game's model.
+- **Post-song report** — a score-share breakdown (which moves earned what, as a % of the run plus compact totals), Stars earned, and a level-up hero panel.
+- **Leveling** — XP matched 1-to-1 to your official score, levels, and titles that persist across sessions.
 - **Career Stats (F6)** — most-played tracks, top scores, and your level, aggregated from local history.
-- **Live glance** — a small bottom-left panel showing your PB, live Sync %, live Perfect Sync Streak (current / peak), PB Delta trajectory comparison, active song BPM, and dynamic "ON FIRE" Hype indicator.
+- **Live glance** — a small bottom-left panel showing your PB, PB Delta trajectory comparison, and the active song BPM.
 - **Hub badge** — a quiet "Marquee ON" indicator, shown only in The Encore.
 
 ## Why the rewrite?
@@ -71,15 +71,15 @@ Marquee is **display-only** for lyrics: it reads cached `.lrc` files but never f
 
 | Variable | Default | Description |
 |---|---|---|
-| `HUD_MAIN_ALLIGNMENT` | `"bottomleft"` | Anchor for the live PB / Sync panel. |
-| `HUD_UPDATE_INTERVAL_MS` | `400` | Live-HUD refresh rate (ms). |
+| `HUD_MAIN_ALLIGNMENT` | `"bottomleft"` | Anchor for the live PB / Delta panel. |
+| `HUD_UPDATE_INTERVAL_MS` | `100` | Live-HUD refresh rate (ms). |
 | `LYRICS_ENABLED` | `true` | Master lyrics on/off (also toggled with F2). |
 | `LYRICS_DUMP_CATALOG` | `true` | At boot: dump the full song-catalog manifest (`_catalog.jsonl`) for the importer (dadtool). |
 | `LEVELING_ENABLED` | `true` | Track XP and levels. |
 
 ## Leveling & Titles
 
-Marquee features a progression system with 20 levels. XP is earned by completing songs, calculated as the song's score weighted by your average sync accuracy.
+Marquee features a progression system with 20 levels. XP is earned by completing songs, calculated 1-to-1 from the song's official score (ensuring that spending your Fever currency on special moves is rewarded rather than penalized).
 
 | Level | Title | Cumulative XP | Tier |
 |---|---|---|---|

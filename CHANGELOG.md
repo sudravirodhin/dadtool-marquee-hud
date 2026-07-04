@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-- **Stale Fever/Combo/Multiplier HUD Duplicate Widgets**: Removed the Fever, Multiplier, and Combo readouts from the live in-game progress HUD because they are already natively displayed by the game UI. Removed the Fever average/peak readout from the end-of-song Results screen to treat Fever strictly as a spendable combat resource.
+- **Stale Fever/Combo/Multiplier HUD Duplicate Widgets**: Removed the Fever, Multiplier, and Combo readouts from the live in-game progress HUD because they duplicate native game indicators. The live HUD now focuses purely on **BPM, PB, and Delta**—valuable new indicators not natively present during gameplay. Additionally, removed Fever from the post-song Results screen to treat it strictly as a spendable combat resource, rather than a grading score.
 
 ## [0.4.26] - 2026-07-04
 
