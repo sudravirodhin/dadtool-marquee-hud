@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.27] - 2026-07-04
+
 ### Removed
 
 - **Stale Fever/Combo/Multiplier HUD Duplicate Widgets**: Removed the Fever, Multiplier, and Combo readouts from the live in-game progress HUD because they are already natively displayed by the game UI. Removed the Fever average/peak readout from the end-of-song Results screen to treat Fever strictly as a spendable combat resource.
@@ -295,7 +297,8 @@ _DiscoTracker upstream history below._
 - Accuracy and Combo monitoring.
 - HighScore persistence.
 
-[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.26...HEAD
+[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.27...HEAD
+[0.4.27]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.26...v0.4.27
 [0.4.26]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.25...v0.4.26
 [0.4.25]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.24...v0.4.25
 [0.4.24]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.23...v0.4.24
