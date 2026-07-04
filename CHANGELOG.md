@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **Configurable Perfect Streak Threshold & Out-of-Combat Gating**: Added `STREAK_THRESHOLD` to `config.lua` (defaulting to 0.90) so players can customize the precision required to build and maintain the Perfect Streak. Gated the streak reset logic to ignore movement and navigation hits (which have 0 sync) between combat arenas, preventing dashes/jumps out-of-combat from breaking active streaks.
+
 ## [0.4.24] - 2026-07-04
 
 ### Fixed

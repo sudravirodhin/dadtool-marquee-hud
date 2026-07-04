@@ -1,7 +1,7 @@
 local cfg = {}
 
 -- ~version (bump MARQUEE_VERSION on releases; UE4SS_VERSION updated when the loader is swapped)
-cfg.MARQUEE_VERSION = "0.4.24"
+cfg.MARQUEE_VERSION = "0.4.25"
 cfg.UE4SS_VERSION = "4.0.0-rc1-custom"
 
 -- ~log
@@ -64,11 +64,8 @@ cfg.LEVELING_ENABLED = true        -- track XP + levels and show them on the res
 -- cfg.LEVEL_THRESHOLDS = { ... }  -- optional override of the cumulative XP curve
 
 --[[
-    ============ ~input overlay cfg ============
+    ============ ~streak cfg ============
 --]]
-cfg.INPUT_OVERLAY_ENABLED = false       -- master toggle to show controller/keyboard button presses on-screen
-cfg.INPUT_OVERLAY_ALIGNMENT = "bottomleft"
-cfg.INPUT_OVERLAY_POS_X = 15
-cfg.INPUT_OVERLAY_POS_Y = -120          -- stacked neatly above the live progress HUD (at -15)
+cfg.STREAK_THRESHOLD = 0.90             -- target fraction of max sync to build streak (e.g. 0.90 = 90% perfect match)
 
 return cfg

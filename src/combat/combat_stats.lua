@@ -346,10 +346,13 @@ function M.RecordHit(state, combo)
   if not snap then return end
   local f = M.SyncFraction(snap)
   if f then
-    if f >= 0.95 then
+    local threshold = cfg.STREAK_THRESHOLD or 0.90
+    if f >= threshold then
       state.SyncStreak = (state.SyncStreak or 0) + 1
       state.SyncStreakMax = math.max(state.SyncStreakMax or 0, state.SyncStreak)
-    else
+    elseif f > 0 then
+      -- Only reset streak on an active combat hit that misses the threshold (sync > 0)
+      -- Out-of-combat movement/dashes that increase combo but have 0 sync won't reset it
       state.SyncStreak = 0
     end
     pcall(function() require("imgui.in_game_progress_hud").Update(state, snap) end)
