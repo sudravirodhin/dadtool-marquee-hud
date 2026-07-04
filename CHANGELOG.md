@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.28] - 2026-07-04
+
 ### Fixed
 
 - **Native Access Violation on UGC Challenge Check**: Fixed a critical native game crash (Access Violation `0xc0000005` in `FField::GetClass()`) when loading into Infinite Disco/Challenges with `LYRICS_DISABLE_ON_CHALLENGES` enabled. The crash was caused by unsafe `GetOuter()` and `GetClass()` calls on a stale/destructed `CurrentChallenge` object. Simplified the check to match by `CurrentChallenge:GetFName():ToString()` only, and resolved a configuration migration bug by defaulting the condition check to `== true` instead of `~= false`.
@@ -301,7 +303,8 @@ _DiscoTracker upstream history below._
 - Accuracy and Combo monitoring.
 - HighScore persistence.
 
-[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.27...HEAD
+[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.28...HEAD
+[0.4.28]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.27...v0.4.28
 [0.4.27]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.26...v0.4.27
 [0.4.26]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.25...v0.4.26
 [0.4.25]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.24...v0.4.25
