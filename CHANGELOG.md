@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **UMG Object Name Collision HUD Freeze**: Fixed a bug where playing a second song in the same level session without a map load (such as playing Remedy after another song) failed to create or update the in-game HUD. Replaced hardcoded FName constructor arguments with anonymous `FName()` calls, letting Unreal Engine assign unique object names and preventing GameInstance namespace collisions for resident widgets.
+
 ## [0.4.22] - 2026-07-04
 
 ### Optimized
