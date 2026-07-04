@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.25] - 2026-07-04
+
 ### Added
 
 - **Configurable Perfect Streak Threshold & Out-of-Combat Gating**: Added `STREAK_THRESHOLD` to `config.lua` (defaulting to 0.90) so players can customize the precision required to build and maintain the Perfect Streak. Gated the streak reset logic to ignore movement and navigation hits (which have 0 sync) between combat arenas, preventing dashes/jumps out-of-combat from breaking active streaks.
@@ -287,7 +289,8 @@ _DiscoTracker upstream history below._
 - Accuracy and Combo monitoring.
 - HighScore persistence.
 
-[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.24...HEAD
+[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.25...HEAD
+[0.4.25]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.24...v0.4.25
 [0.4.24]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.23...v0.4.24
 [0.4.23]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.22...v0.4.23
 [0.4.22]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.21...v0.4.22
