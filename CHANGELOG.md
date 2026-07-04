@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.23] - 2026-07-04
+
 ### Fixed
 
 - **UMG Object Name Collision HUD Freeze**: Fixed a bug where playing a second song in the same level session without a map load (such as playing Remedy after another song) failed to create or update the in-game HUD. Replaced hardcoded FName constructor arguments with anonymous `FName()` calls, letting Unreal Engine assign unique object names and preventing GameInstance namespace collisions for resident widgets.
@@ -275,7 +277,8 @@ _DiscoTracker upstream history below._
 - Accuracy and Combo monitoring.
 - HighScore persistence.
 
-[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.22...HEAD
+[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.23...HEAD
+[0.4.23]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.22...v0.4.23
 [0.4.22]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.21...v0.4.22
 [0.4.21]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.20...v0.4.21
 [0.4.20]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.19...v0.4.20
