@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.24] - 2026-07-04
+
 ### Fixed
 
 - **UE4SS FName Argument Overload Crash**: Fixed a critical crash where parameterless `FName()` constructor calls failed due to lack of a 0-argument constructor overload in this UE4SS release (resulting in `No overload found for function 'FName'`). Implemented `genUniqueName(prefix)` which generates unique string-based FNames dynamically using an auto-incremented counter, preventing construct errors and restoring HUD drawing.
@@ -281,7 +283,8 @@ _DiscoTracker upstream history below._
 - Accuracy and Combo monitoring.
 - HighScore persistence.
 
-[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.23...HEAD
+[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.24...HEAD
+[0.4.24]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.23...v0.4.24
 [0.4.23]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.22...v0.4.23
 [0.4.22]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.21...v0.4.22
 [0.4.21]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.20...v0.4.21
