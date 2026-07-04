@@ -70,14 +70,7 @@ local function renderLeftColumn(container, s)
 		color = hud_utils.FSlateColor(1, 1, 1, 1),
 	})
 
-	local avg, peak = s.FinalAvgSync, s.FinalPeakSync
-	umg_factory.CreateTextBlock(box, "SyncLine", {
-		size = 14,
-		text = string.format("Fever: %s avg  /  %s peak",
-			avg and string.format("%d%%", math.floor(avg * 100 + 0.5)) or "—",
-			peak and string.format("%d%%", math.floor(peak * 100 + 0.5)) or "—"),
-		color = hud_utils.SyncColor(avg or 0),
-	})
+
 
 	if (s.StarsEarned or 0) > 0 then
 		umg_factory.CreateTextBlock(box, "StarsLine", {
