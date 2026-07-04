@@ -1,7 +1,7 @@
 local cfg = {}
 
 -- ~version (bump MARQUEE_VERSION on releases; UE4SS_VERSION updated when the loader is swapped)
-cfg.MARQUEE_VERSION = "0.4.25"
+cfg.MARQUEE_VERSION = "0.4.26"
 cfg.UE4SS_VERSION = "4.0.0-rc1-custom"
 
 -- ~log
@@ -62,10 +62,5 @@ cfg.LEVELING_ENABLED = true        -- track XP + levels and show them on the res
 -- cfg.XP_FULLCOMBO_BONUS_PCT = 10    -- +% XP when full combo
 -- cfg.LEVEL_TITLES = { ... }      -- optional override of the 20 level titles
 -- cfg.LEVEL_THRESHOLDS = { ... }  -- optional override of the cumulative XP curve
-
---[[
-    ============ ~streak cfg ============
---]]
-cfg.STREAK_THRESHOLD = 0.90             -- target fraction of max sync to build streak (e.g. 0.90 = 90% perfect match)
 
 return cfg

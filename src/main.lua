@@ -35,7 +35,7 @@ _G.__SessionAggAccuracy = _G.__SessionAggAccuracy or {
 	MaxCombo = 0,
 	Multiplier = 1,
 	-- sync ("rhythm perfection") accumulators
-	SyncSamples = 0, SyncSum = 0, SyncPeak = 0, SyncStreak = 0, SyncStreakMax = 0,
+	SyncSamples = 0, SyncSum = 0, SyncPeak = 0,
 	-- end-of-song snapshot
 	MoveScores = nil, FinalAvgSync = nil, FinalPeakSync = nil, StarsAtEnd = nil,
 	-- song identity / lyrics inputs
@@ -316,8 +316,8 @@ RegisterKeyBind(Key.F5, function()
 			log.info("  CachedPB: nil")
 		end
 
-		log.info(string.format("  Current Score: %d, Streak: %d, Max Streak: %d",
-			state.TotalScore or 0, state.SyncStreak or 0, state.SyncStreakMax or 0))
+		log.info(string.format("  Current Score: %d, Combo: %d, Max Combo: %d",
+			state.TotalScore or 0, state.Combo or 0, state.MaxCombo or 0))
 	end)
 end)
 

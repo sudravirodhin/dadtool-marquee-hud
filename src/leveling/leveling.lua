@@ -92,7 +92,7 @@ local function saveProfile(p)
   end
 end
 
--- One-time seed: convert existing PB history into starting XP (weighted like a run).
+-- One-time seed: convert existing PB history into starting XP (1-to-1 from score).
 function M.SeedFromHistory()
   local total = 0
   pcall(function()
@@ -101,9 +101,7 @@ function M.SeedFromHistory()
     for _, pb in pairs(history) do
       local score = tonumber(pb.highScore) or 0
       if score > 0 then
-        local sync = tonumber(pb.bestSync) or 0.5   -- old records had no sync; assume mid
-        sync = math.max(0, math.min(1, sync))
-        total = total + math.floor(score * (0.75 + 0.5 * sync) + 0.5)
+        total = total + score
       end
     end
   end)
@@ -126,15 +124,11 @@ function M.Get()
   return M._profile
 end
 
--- XP for one finished run: the game's OWN combat score, weighted by rhythm sync (the
--- DaD-native "perfect" signal — see dad-combat-stats-api). avgSync 0 -> x0.75,
--- 0.5 -> x1.0, 1.0 -> x1.25. No accuracy/miss concept; score already bakes in combo+mult.
+-- XP for one finished run: the game's OWN combat score (no longer weighted by Fever/sync,
+-- since Fever is a spendable currency and shouldn't penalize special moves).
 function M.XpForRun(state)
   local score = tonumber(state.TotalScore) or 0
-  if score <= 0 then return 0 end
-  local sync = tonumber(state.FinalAvgSync) or 0
-  sync = math.max(0, math.min(1, sync))
-  return math.floor(score * (0.75 + 0.5 * sync) + 0.5)
+  return math.max(0, math.floor(score))
 end
 
 -- Award XP for a finished run (idempotent per song via state.__xpAwarded).

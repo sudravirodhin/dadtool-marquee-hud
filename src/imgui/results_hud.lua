@@ -73,18 +73,11 @@ local function renderLeftColumn(container, s)
 	local avg, peak = s.FinalAvgSync, s.FinalPeakSync
 	umg_factory.CreateTextBlock(box, "SyncLine", {
 		size = 14,
-		text = string.format("Sync: %s avg  /  %s peak",
+		text = string.format("Fever: %s avg  /  %s peak",
 			avg and string.format("%d%%", math.floor(avg * 100 + 0.5)) or "—",
 			peak and string.format("%d%%", math.floor(peak * 100 + 0.5)) or "—"),
 		color = hud_utils.SyncColor(avg or 0),
 	})
-
-	if (s.SyncStreakMax or 0) > 0 then
-		umg_factory.CreateTextBlock(box, "StreakLine", {
-			size = 12, text = string.format("Best perfect streak: %d", s.SyncStreakMax),
-			color = hud_utils.FSlateColor(0.69, 0.15, 1, 0.9),
-		})
-	end
 
 	if (s.StarsEarned or 0) > 0 then
 		umg_factory.CreateTextBlock(box, "StarsLine", {

@@ -34,9 +34,9 @@ function M.Create()
 
 	-- Setup HUD elements aligned to 6-character labels for perfect spacing
 	row("BPM   ", "bpm")
-	row("Sync  ", "sync", hud_utils.SyncColor(1))
-	row("Streak", "streak")
-	row("Hype  ", "hype")
+	row("Fever ", "fever", hud_utils.SyncColor(1))
+	row("Mult  ", "mult")
+	row("Combo ", "combo")
 	row("PB    ", "pb")
 	row("Delta ", "pb_delta")
 
@@ -98,31 +98,39 @@ function M.Update(state, snap)
 		set_widget_val("bpm", "—", hud_utils.FSlateColor(1, 1, 1, 0.5))
 	end
 
-	-- 2. Live sync %
+	-- 2. Live Fever %
 	if frac then
-		set_widget_val("sync", string.format("%d%%", math.floor(frac * 100 + 0.5)), hud_utils.SyncColor(frac))
+		set_widget_val("fever", string.format("%d%%", math.floor(frac * 100 + 0.5)), hud_utils.SyncColor(frac))
 	else
-		set_widget_val("sync", "—")
+		set_widget_val("fever", "—")
 	end
 
-	-- 3. Perfect Streak (Sync Streak)
-	if state and type(state.SyncStreak) == "number" and type(state.SyncStreakMax) == "number" then
-		local current = state.SyncStreak
-		local max = state.SyncStreakMax
-		local color = (current > 0 and current == max) and hud_utils.FSlateColor(0.1, 1, 0.1, 0.9) or hud_utils.FSlateColor(1, 1, 1, 0.9)
-		set_widget_val("streak", string.format("%d (max %d)", current, max), color)
+	-- 3. Combo / Max Combo
+	if state and type(state.Combo) == "number" and type(state.MaxCombo) == "number" then
+		local current = state.Combo
+		local max = state.MaxCombo
+		local color = (current > 0 and current == max) and hud_utils.FSlateColor(0.1, 1, 0.1, 0.9) or hud_utils.FSlateColor(0.2, 0.9, 1, 0.9)
+		set_widget_val("combo", string.format("%d (max %d)", current, max), color)
 	else
-		set_widget_val("streak", "—", hud_utils.FSlateColor(1, 1, 1, 0.5))
+		set_widget_val("combo", "—", hud_utils.FSlateColor(0.2, 0.9, 1, 0.5))
 	end
 
-	-- 4. PB to beat
+	-- 4. Score Multiplier
+	local multVal = (state and state.Multiplier) or (snap and snap.mult)
+	if type(multVal) == "number" then
+		set_widget_val("mult", string.format("x%.1f", multVal), hud_utils.FSlateColor(1, 0.85, 0.2, 0.9))
+	else
+		set_widget_val("mult", "—", hud_utils.FSlateColor(1, 0.85, 0.2, 0.5))
+	end
+
+	-- 5. PB to beat
 	if state and state.CachedPB and state.CachedPB.highScore and state.CachedPB.highScore > 0 then
 		set_widget_val("pb", hud_utils.Abbrev(state.CachedPB.highScore))
 	else
 		set_widget_val("pb", "—")
 	end
 
-	-- 5. Live PB Delta (ghost tracker)
+	-- 6. Live PB Delta (ghost tracker)
 	if state and type(state.PbDelta) == "number" then
 		local d = state.PbDelta
 		local prefix = d >= 0 and "+" or ""
@@ -130,21 +138,6 @@ function M.Update(state, snap)
 		set_widget_val("pb_delta", string.format("%s%s", prefix, hud_utils.Commafy(math.floor(d + 0.5))), color)
 	else
 		set_widget_val("pb_delta", "—", hud_utils.FSlateColor(1, 1, 1, 0.5))
-	end
-
-	-- 6. Hype status and flare-up indicator
-	if state and state.HypeStatus then
-		local is_on_fire = (state.HypeStatus == "ON FIRE")
-		local color = is_on_fire and hud_utils.FSlateColor(1, 0.5, 0, 1) or hud_utils.FSlateColor(1, 1, 1, 0.5)
-		set_widget_val("hype", state.HypeStatus, color)
-
-		-- Flare up the border brush color
-		if M.borderWidget and M.borderWidget:IsValid() then
-			local bColor = is_on_fire and hud_utils.FLinearColor(1, 0.5, 0, 0.6) or hud_utils.FLinearColor(0, 0, 0, 0.2)
-			pcall(call_set_brush_color, M.borderWidget, bColor)
-		end
-	else
-		set_widget_val("hype", "—", hud_utils.FSlateColor(1, 1, 1, 0.5))
 	end
 end
 

@@ -165,26 +165,6 @@ function M.Accumulate(state, snap)
       end
     end
   end
-
-  -- 3. Hype status (rolling average of sync accuracy over the last 10s -> 25 samples)
-  state.RecentSync = state.RecentSync or {}
-  if f then
-    table.insert(state.RecentSync, f)
-    if #state.RecentSync > 25 then
-      table.remove(state.RecentSync, 1)
-    end
-    local sum = 0
-    for _, v in ipairs(state.RecentSync) do sum = sum + v end
-    state.RecentSyncAvg = sum / #state.RecentSync
-
-    if #state.RecentSync >= 5 and state.RecentSyncAvg >= 0.90 then
-      state.HypeStatus = "ON FIRE"
-    else
-      state.HypeStatus = "—"
-    end
-  else
-    state.HypeStatus = "—"
-  end
 end
 
 function M.AvgSync(state)
@@ -311,7 +291,6 @@ function M.Reset(state)
   if not state then return end
   state.__capturedFinal = false
   state.SyncSamples, state.SyncSum, state.SyncPeak = 0, 0, 0
-  state.SyncStreak, state.SyncStreakMax = 0, 0
   state.Combo, state.MaxCombo, state.Multiplier = 0, 0, 1
   state.MoveScores = nil
   state.__moveTick = 0
@@ -321,9 +300,6 @@ function M.Reset(state)
 
   -- Clear and initialize our features' state
   state.PbDelta = nil
-  state.RecentSync = {}
-  state.RecentSyncAvg = 0
-  state.HypeStatus = "—"
   state.Bpm = nil
 end
 
@@ -333,30 +309,11 @@ end
 
 function M.RecordHit(state, combo)
   if not state then return end
-  local prevCombo = state.Combo or 0
   state.Combo = combo
-
-  if combo == 0 or combo < prevCombo then
-    state.SyncStreak = 0
-    pcall(function() require("imgui.in_game_progress_hud").Update(state, M.Poll()) end)
-    return
-  end
+  state.MaxCombo = math.max(state.MaxCombo or 0, combo)
 
   local snap = M.Poll()
-  if not snap then return end
-  local f = M.SyncFraction(snap)
-  if f then
-    local threshold = cfg.STREAK_THRESHOLD or 0.90
-    if f >= threshold then
-      state.SyncStreak = (state.SyncStreak or 0) + 1
-      state.SyncStreakMax = math.max(state.SyncStreakMax or 0, state.SyncStreak)
-    elseif f > 0 then
-      -- Only reset streak on an active combat hit that misses the threshold (sync > 0)
-      -- Out-of-combat movement/dashes that increase combo but have 0 sync won't reset it
-      state.SyncStreak = 0
-    end
-    pcall(function() require("imgui.in_game_progress_hud").Update(state, snap) end)
-  end
+  pcall(function() require("imgui.in_game_progress_hud").Update(state, snap) end)
 end
 
 return M
