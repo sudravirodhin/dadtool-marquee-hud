@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Self-Healing Gameplay State & Lyrics Resolution**: Fixed an issue where lyrics and live HUD stats failed to display during gameplay because the session state remained stuck in `PRE_GAME`. Removed an invalid `:get()` call and overly strict `InPlaythrough` check on `ResetPlayerAttributesForRespawn`, and added a self-healing auto-transition to `IN_GAME` in `hud_handler.Sync()` whenever the player enters a non-hub gameplay map.
+
 ## [0.4.28] - 2026-07-04
 
 ### Fixed

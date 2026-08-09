@@ -134,6 +134,7 @@ local function OnSongStart()
 	hud_handler.SetState(hud_handler.States.IN_GAME, state)
 	log.debug("Gameplay started — polling combat stats (no per-move hooks)")
 end
+_G.OnSongStart = OnSongStart
 
 local function OnResults()
 	local state = _G.__SessionAggAccuracy
@@ -165,15 +166,12 @@ local function RegisterLifecycleHooks()
 		pcall(function() hud_handler.SetState(hud_handler.States.PRE_GAME, _G.__SessionAggAccuracy) end)
 		pcall(function() lyrics_handler.OnSongEnd() end)
 	end)
-	-- gameplay start / retry (BP_PagodaGameMode covers all modes). Guard the self read.
+	-- gameplay start / retry (BP_PagodaGameMode covers all modes). Guard against hub world.
 	RegisterHook(GAME_PATHS.GameMode .. ":ResetPlayerAttributesForRespawn", function(wrappedSelf)
 		pcall(function()
-			local self = wrappedSelf and wrappedSelf:get()
-			if not self then return end
-			local inPlay = false
-			pcall(function() inPlay = (self.InPlaythrough == true) end)
-			if not inPlay then return end
-			OnSongStart()
+			if not hud_handler.IsHubWorld() then
+				OnSongStart()
+			end
 		end)
 	end)
 end

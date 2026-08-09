@@ -153,6 +153,13 @@ end
 function M.Sync(sessionState)
 	M.EnsureUI()
 
+	-- Self-healing state transition: if in a gameplay map but state is PRE_GAME, trigger OnSongStart
+	if M.CurrentState == M.States.PRE_GAME and not M.IsHubWorld() then
+		if _G.OnSongStart then
+			pcall(_G.OnSongStart)
+		end
+	end
+
 	-- The live stats panel is only on screen during gameplay; in menus and on the
 	-- results screen it's hidden. Updating its text there is wasted work (every
 	-- SetText is a reflected engine call), so skip it entirely unless we're actually
