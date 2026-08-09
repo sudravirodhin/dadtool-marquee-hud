@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.31] - 2026-08-09
+
 ## [0.4.30] - 2026-08-09
 
 ## [0.4.29] - 2026-08-09
@@ -312,7 +314,8 @@ _DiscoTracker upstream history below._
 - Accuracy and Combo monitoring.
 - HighScore persistence.
 
-[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.30...HEAD
+[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.31...HEAD
+[0.4.31]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.30...v0.4.31
 [0.4.30]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.29...v0.4.30
 [0.4.29]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.28...v0.4.29
 [0.4.28]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.27...v0.4.28
