@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.31] - 2026-08-09
+
+### Fixed
+
+- **Challenge Level Property Reflection Crash**: Fixed a native crash (`0xc0000005` in `UnrealType.hpp:L2879` `TFieldIterator`) when loading challenges. The crash was caused by unsafe reflection property lookups on `PagodaChallengeGameStateComponent` during level load. Removed the unsafe component reflection check from `lyrics_handler.lua` in favor of safe map-name pattern matching.
+
 ## [0.4.30] - 2026-08-09
 
 ## [0.4.29] - 2026-08-09

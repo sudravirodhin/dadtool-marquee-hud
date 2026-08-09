@@ -130,29 +130,8 @@ function M.OnSongStart(state)
       end
     end
 
-    -- If map-name check didn't flag it, check PagodaChallengeGameStateComponent to distinguish 
-    -- standard Infinite Disco play from actual challenges (premade or UGC).
-    if not isChallenge then
-      pcall(function()
-        local comps = FindAllOf("PagodaChallengeGameStateComponent")
-        local comp = comps and comps[1]
-        if comp and comp:IsValid() then
-          local cc = comp.CurrentChallenge
-          if cc and cc:IsValid() then
-            local name = cc:GetFName():ToString()
-            -- Default Free Play (standard Infinite Disco) has name == "DA_Challenge_"
-            -- Custom/premade/UGC challenges have custom names.
-            if name ~= "DA_Challenge_" then
-              isChallenge = true
-              log.debug(string.format("[lyrics] active challenge detected via name check: name=%s", name))
-            end
-          end
-        end
-      end)
-    end
-
     if isChallenge then
-      log.info("[lyrics] challenge map or active challenge detected, skipping lyrics")
+      log.info("[lyrics] challenge map detected, skipping lyrics")
       lyrics_hud.Hide()
       return
     end
