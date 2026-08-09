@@ -27,7 +27,7 @@ M.CurrentState = M.States.PRE_GAME
 -- that map's asset name ahead of time, so match the live map's full path against
 -- cfg.HUB_MAP_NAMES (substrings) and log it once per change so the real name can be
 -- pinned. If detection itself fails we DON'T suppress the badge (graceful fallback).
-local HUB_NAMES = cfg.HUB_MAP_NAMES or { "encore" }
+local HUB_NAMES = cfg.HUB_MAP_NAMES or { "encore", "divebar", "main_menu", "mainmenu", "startup", "levelselect" }
 local _lastMapId = nil
 
 local function call_is_valid(o)
@@ -153,11 +153,19 @@ end
 function M.Sync(sessionState)
 	M.EnsureUI()
 
-	-- Self-healing state transition: if in a gameplay map but state is PRE_GAME, trigger OnSongStart
+	-- Self-healing state transition: if in a gameplay map but state is PRE_GAME, trigger OnSongStart only when a real song is playing
 	if M.CurrentState == M.States.PRE_GAME and not M.IsHubWorld() then
-		if _G.OnSongStart then
-			pcall(_G.OnSongStart)
-		end
+		pcall(function()
+			if _G.CaptureSongMetadata then
+				_G.CaptureSongMetadata()
+			end
+			local liveState = sessionState or _G.__SessionAggAccuracy
+			if liveState and liveState.SongName and liveState.SongName ~= "Unknown" and liveState.SongName ~= "No Song" then
+				if _G.OnSongStart then
+					_G.OnSongStart()
+				end
+			end
+		end)
 	end
 
 	-- The live stats panel is only on screen during gameplay; in menus and on the

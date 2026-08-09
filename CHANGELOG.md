@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Premature Startup Intro Map Transition Crash**: Fixed a native crash (`0xc0000005` in `FField.cpp:L634`) caused by prematurely triggering gameplay initialization while the game was still loading the intro credits movie (`L_Startup`). Expanded `HUB_NAMES` in `hud_handler.lua` to include all non-gameplay intro/menu/hub levels (`startup`, `main_menu`, `levelselect`, `divebar`, `encore`), and double-guarded the auto-transition check to only run when a valid, non-"Unknown"/"No Song" track is active.
 - **Self-Healing Gameplay State & Lyrics Resolution**: Fixed an issue where lyrics and live HUD stats failed to display during gameplay because the session state remained stuck in `PRE_GAME`. Removed an invalid `:get()` call and overly strict `InPlaythrough` check on `ResetPlayerAttributesForRespawn`, and added a self-healing auto-transition to `IN_GAME` in `hud_handler.Sync()` whenever the player enters a non-hub gameplay map.
 
 ## [0.4.28] - 2026-07-04
