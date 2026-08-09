@@ -11,21 +11,23 @@
 
 It is a fork of **[DiscoTracker](https://github.com/lucashort7/dad-performance-tracker)** by *hort (lucashort7)*, rebuilt around two ideas: read the game's real combat tallies instead of inventing hit-accuracy, and put the lyrics on screen.
 
-> ✅ **Status — Verified Stable.** Marquee has been fully tested and verified stable on *Dead as Disco* build `++brainjar+release-CL-29008` (the June 16 2026 *"Summer Flames Tour"* update) when used with our custom-compiled UE4SS loader binaries included in the full release bundle.
+> ✅ **Status — Verified Stable.** Marquee has been fully tested and verified stable on *Dead as Disco* build `++brainjar+release-CL-29008` (including August 2026 patches) when used with our custom-compiled UE4SS loader binaries included in the full release bundle.
 
 ## Features
 
 - **Synced lyrics** — a karaoke bar that scrolls in time with the music, reading the game's playhead so it stays drift-free through pauses and restarts. Per-song timing nudge saved to disk.
-- **DaD-native tracking** — *polls* the game's own combat tallies (Score, Max Combo, score multiplier, Stars) rather than hooking individual moves. No invented accuracy — it's the game's model.
+- **DaD-native tracking** — *polls* the game's own combat tallies (Score, Max Combo, score multiplier, Stars) rather than hooking individual moves. No invented accuracy — it's the game's official model.
 - **Post-song report** — a score-share breakdown (which moves earned what, as a % of the run plus compact totals), Stars earned, and a level-up hero panel.
 - **Leveling** — XP matched 1-to-1 to your official score, levels, and titles that persist across sessions.
 - **Career Stats (F6)** — most-played tracks, top scores, and your level, aggregated from local history.
-- **Live glance** — a small bottom-left panel showing your PB, PB Delta trajectory comparison, and the active song BPM.
-- **Hub badge** — a quiet "Marquee ON" indicator, shown only in The Encore.
+- **Live glance** — a sleek bottom-left panel showing your Personal Best (PB), live PB Delta trajectory (+/- comparison), and active song BPM without cluttering native UI.
+- **Hub badge** — a quiet "Marquee ON" indicator, shown only in The Encore hub.
 
 ## Why the rewrite?
 
 DiscoTracker tracked invented hit-accuracy ("Perfect" rates, letter ranks) by hooking every combat move. Marquee instead **reads the game's own combat tallies** (the same numbers it uses for unlocks). That's truer to *Dead as Disco* — which isn't an accuracy game — and a lighter-touch design that leans on the game's existing data instead of instrumenting every move.
+
+The live in-game HUD was also intentionally streamlined to display only new, actionable metrics not previously present in the base game—your **Personal Best**, real-time **PB Delta**, and **Song BPM**—avoiding visual duplication of the native Combo, Fever, and Multiplier readouts.
 
 ## Install
 
