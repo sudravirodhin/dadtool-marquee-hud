@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.29] - 2026-08-09
+
 ### Fixed
 
 - **Self-Healing Gameplay State & Lyrics Resolution**: Fixed an issue where lyrics and live HUD stats failed to display during gameplay because the session state remained stuck in `PRE_GAME`. Removed an invalid `:get()` call and overly strict `InPlaythrough` check on `ResetPlayerAttributesForRespawn`, and added a self-healing auto-transition to `IN_GAME` in `hud_handler.Sync()` whenever the player enters a non-hub gameplay map.
@@ -307,7 +309,8 @@ _DiscoTracker upstream history below._
 - Accuracy and Combo monitoring.
 - HighScore persistence.
 
-[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.28...HEAD
+[unreleased]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.29...HEAD
+[0.4.29]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.28...v0.4.29
 [0.4.28]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.27...v0.4.28
 [0.4.27]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.26...v0.4.27
 [0.4.26]: https://github.com/sudravirodhin/dadtool-marquee-hud/compare/v0.4.25...v0.4.26
