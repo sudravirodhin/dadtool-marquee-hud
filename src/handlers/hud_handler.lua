@@ -27,7 +27,8 @@ M.CurrentState = M.States.PRE_GAME
 -- that map's asset name ahead of time, so match the live map's full path against
 -- cfg.HUB_MAP_NAMES (substrings) and log it once per change so the real name can be
 -- pinned. If detection itself fails we DON'T suppress the badge (graceful fallback).
-local HUB_NAMES = cfg.HUB_MAP_NAMES or { "encore", "divebar", "main_menu", "mainmenu", "startup", "levelselect" }
+local HUB_NAMES = cfg.HUB_MAP_NAMES or { "divebar", "encore" }
+local NON_GAMEPLAY_NAMES = cfg.NON_GAMEPLAY_MAP_NAMES or { "divebar", "encore", "main_menu", "mainmenu", "startup", "levelselect", "menu" }
 local _lastMapId = nil
 
 local function call_is_valid(o)
@@ -54,15 +55,27 @@ local function getMapId()
 	return id
 end
 
+--- Returns true ONLY when in The Encore hub (used to display the mod status badge)
 function M.IsHubWorld()
 	local id = getMapId()
 	if id ~= _lastMapId then
 		_lastMapId = id
 		log.info("[hud] current map = " .. tostring(id))
 	end
-	if not id or id == "" then return true end   -- detection failed -> keep the badge
+	if not id or id == "" then return false end
 	local low = id:lower()
 	for _, frag in ipairs(HUB_NAMES) do
+		if low:find(frag, 1, true) then return true end
+	end
+	return false
+end
+
+--- Returns true for any non-gameplay map (menus, hub, intro, level select)
+function M.IsNonGameplayWorld()
+	local id = getMapId()
+	if not id or id == "" then return true end -- fail safe: don't start in-game tracking if map is uninitialized
+	local low = id:lower()
+	for _, frag in ipairs(NON_GAMEPLAY_NAMES) do
 		if low:find(frag, 1, true) then return true end
 	end
 	return false
@@ -154,7 +167,7 @@ function M.Sync(sessionState)
 	M.EnsureUI()
 
 	-- Self-healing state transition: if in a gameplay map but state is PRE_GAME, trigger OnSongStart only when a real song is playing
-	if M.CurrentState == M.States.PRE_GAME and not M.IsHubWorld() then
+	if M.CurrentState == M.States.PRE_GAME and not M.IsNonGameplayWorld() then
 		pcall(function()
 			if _G.CaptureSongMetadata then
 				_G.CaptureSongMetadata()

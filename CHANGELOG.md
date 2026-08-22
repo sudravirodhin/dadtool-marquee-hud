@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Main Menu Background Music State Transition Crash**: Fixed a native crash (`0xc0000005` in `UnrealType.hpp:L2879` `TFieldIterator`) when returning to the Main Menu. The crash occurred because the menu background music (`DeadOrAlive`) was triggering in-game HUD and lyrics initialization inside `Level_MainMenu`. Separated hub status badge map detection (`IsHubWorld`) from general non-gameplay map detection (`IsNonGameplayWorld`), preventing menu maps from ever transitioning into the in-game tracking state.
+
 ## [0.4.31] - 2026-08-09
 
 ### Fixed

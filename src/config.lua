@@ -1,7 +1,7 @@
 local cfg = {}
 
 -- ~version (bump MARQUEE_VERSION on releases; UE4SS_VERSION updated when the loader is swapped)
-cfg.MARQUEE_VERSION = "0.4.31"
+cfg.MARQUEE_VERSION = "0.4.32"
 cfg.UE4SS_VERSION = "4.0.0-rc1-custom"
 
 -- ~log
@@ -22,6 +22,7 @@ cfg.HUD_LABEL_LAYOUT = "friendly"
 -- against these (case-insensitive substrings) — add a fragment here if there are other
 -- free-roam/hub maps the badge should appear in. Logged once per change as "[hud] current map".
 cfg.HUB_MAP_NAMES = { "divebar", "encore" }
+cfg.NON_GAMEPLAY_MAP_NAMES = { "divebar", "encore", "main_menu", "mainmenu", "startup", "levelselect", "menu" }
 
 --[[
     ============ ~lyrics cfg ============

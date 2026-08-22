@@ -166,10 +166,10 @@ local function RegisterLifecycleHooks()
 		pcall(function() hud_handler.SetState(hud_handler.States.PRE_GAME, _G.__SessionAggAccuracy) end)
 		pcall(function() lyrics_handler.OnSongEnd() end)
 	end)
-	-- gameplay start / retry (BP_PagodaGameMode covers all modes). Guard against hub world.
+	-- gameplay start / retry (BP_PagodaGameMode covers all modes). Guard against non-gameplay world.
 	RegisterHook(GAME_PATHS.GameMode .. ":ResetPlayerAttributesForRespawn", function(wrappedSelf)
 		pcall(function()
-			if not hud_handler.IsHubWorld() then
+			if not hud_handler.IsNonGameplayWorld() then
 				OnSongStart()
 			end
 		end)
