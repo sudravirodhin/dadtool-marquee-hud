@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.33] - 2026-08-25
+
+### Changed
+
+- **August 25 Steam Game Update Compatibility**: Recompiled custom UE4SS loader binaries (`UE4SS.dll` and `dwmapi.dll`) from source against the August 25, 2026 Steam game update (`PagodaSteam-Win64-Shipping.exe`). Verified stable gameplay, level transitions, and lyrics synchronization with zero crashes.
+
+## [0.4.32] - 2026-08-21
+
 ### Fixed
 
 - **Main Menu Background Music State Transition Crash**: Fixed a native crash (`0xc0000005` in `UnrealType.hpp:L2879` `TFieldIterator`) when returning to the Main Menu. The crash occurred because the menu background music (`DeadOrAlive`) was triggering in-game HUD and lyrics initialization inside `Level_MainMenu`. Separated hub status badge map detection (`IsHubWorld`) from general non-gameplay map detection (`IsNonGameplayWorld`), preventing menu maps from ever transitioning into the in-game tracking state.
