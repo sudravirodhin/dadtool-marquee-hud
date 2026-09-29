@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **September 29 Steam Game Update Compatibility**: Recompiled custom UE4SS loader binaries (`UE4SS.dll` and `dwmapi.dll`) from source against the September 29, 2026 Steam game update (`PagodaSteam-Win64-Shipping.exe`). Verified binary integrity, debug symbols, and mod deployment.
+- **September 29 Steam Game Update Compatibility**: Recompiled custom UE4SS loader binaries (`UE4SS.dll` and `dwmapi.dll`) from source against the September 29, 2026 Steam game update (`PagodaSteam-Win64-Shipping.exe`). Verified binary integrity, debug symbols, and mod deployment (marked as untested pending in-game verification).
 
 ## [0.4.33] - 2026-08-25
 
