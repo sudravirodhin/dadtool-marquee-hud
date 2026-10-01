@@ -11,7 +11,7 @@
 
 It is a fork of **[DiscoTracker](https://github.com/lucashort7/dad-performance-tracker)** by *hort (lucashort7)*, rebuilt around two ideas: read the game's real combat tallies instead of inventing hit-accuracy, and put the lyrics on screen.
 
-> ⚠️ **Status — Untested on Latest Update.** Recompiled with custom UE4SS loader binaries against the September 29, 2026 Steam game update. Pending in-game playthrough verification.
+> ⚠️ **Status — Untested on Latest Update.** Recompiled with custom UE4SS loader binaries against the October 1, 2026 Steam game hotfix. Pending in-game playthrough verification.
 
 ## Features
 
@@ -34,7 +34,7 @@ The live in-game HUD was also intentionally streamlined to display only new, act
 Marquee requires **UE4SS** (the Unreal Engine scripting system). We provide three release options on our **[GitHub Releases page](https://github.com/sudravirodhin/dadtool-marquee-hud/releases)**:
 
 ### Option A: Full Bundle (Recommended)
-This includes the Marquee mod and our custom-compiled UE4SS loader binaries configured for *Dead as Disco* (recompiled for the September 29, 2026 Steam update; in-game testing pending).
+This includes the Marquee mod and our custom-compiled UE4SS loader binaries configured for *Dead as Disco* (recompiled for the October 1, 2026 Steam hotfix; in-game testing pending).
 1. Download the full bundle (`Marquee-vX.Y.Z.zip`) from the releases page.
 2. Unzip its contents directly into `Dead as Disco/Pagoda/Binaries/Win64/` (so that `dwmapi.dll` and the `ue4ss/` directory sit next to `Pagoda-Win64-Shipping.exe`).
 3. Launch the game.
