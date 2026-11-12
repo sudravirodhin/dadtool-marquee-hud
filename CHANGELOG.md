@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.4.41] - 2026-11-12
+
+### Changed
+
+- **November 12 Steam Game Hotfix Compatibility**: Recompiled custom UE4SS loader binaries (`UE4SS.dll` and `dwmapi.dll`) from source against the November 12, 2026 Steam game hotfix (`PagodaSteam-Win64-Shipping.exe`). Verified binary integrity, debug symbols, and mod deployment (marked as untested pending in-game verification).
+
 ## [0.4.40] - 2026-11-09
 
 ### Changed
